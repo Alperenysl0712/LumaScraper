@@ -138,6 +138,14 @@ async def check_l7_sni(sni):
     except Exception:
         return False
 
+async def check_http_connectivity(ip, port):
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(f"http://{ip}:{port}", timeout=CONNECTION_TIMEOUT) as response:
+                return response.status < 500
+    except Exception:
+        return False
+
 async def validate_node(node, semaphore):
     async with semaphore:
         ip = node['ip']
@@ -150,6 +158,10 @@ async def validate_node(node, semaphore):
             )
             writer.close()
             await writer.wait_closed()
+            
+            is_http_alive = await check_http_connectivity(ip, port)
+            if not is_http_alive:
+                return None
 
             if node['sni']:
                 is_l7_alive = await check_l7_sni(node['sni'])
@@ -198,7 +210,6 @@ async def resolve_fallback_countries(nodes):
     return nodes
 
 async def main():
-    print("Starting Luma Shield Premium Scraper with L7 Validation...")
     raw_links = []
 
     async with aiohttp.ClientSession() as session:
@@ -222,7 +233,6 @@ async def main():
             unique_ips.add(node['ip'])
             parsed_nodes.append(node)
 
-    print(f"Testing {len(parsed_nodes)} unique nodes with L7 verification...")
     semaphore = asyncio.Semaphore(CONCURRENCY_LIMIT)
     tasks = [validate_node(node, semaphore) for node in parsed_nodes]
     
@@ -230,7 +240,6 @@ async def main():
 
     alive_nodes = [res for res in results if res is not None and not isinstance(res, Exception)]
 
-    print(f"Resolving remaining physical locations for {len(alive_nodes)} active nodes...")
     verified_nodes = await resolve_fallback_countries(alive_nodes)
 
     country_pools = {}
@@ -244,7 +253,6 @@ async def main():
         country_pools[c].append(node)
 
     json_output = {}
-    total_saved = 0
 
     for country, nodes in country_pools.items():
         nodes.sort(key=lambda x: x['ping'])
@@ -258,12 +266,9 @@ async def main():
                 "countryName": country,
                 "pingMs": n['ping']
             })
-            total_saved += 1
 
     with open('luma_premium_nodes.json', 'w', encoding='utf-8') as f:
         json.dump(json_output, f, ensure_ascii=False, indent=2)
-
-    print(f"Process complete! {total_saved} absolutely verified nodes exported.")
 
 if __name__ == "__main__":
     if sys.platform == 'win32':
