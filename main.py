@@ -56,10 +56,10 @@ SOURCES = [
     "https://raw.githubusercontent.com/JlikO/V2Ray-configs/main/All_Configs_Sub.txt"
 ]
 
-MAX_PING_MS = 200
-CONNECTION_TIMEOUT = 1.5
+MAX_PING_MS = 1500
+CONNECTION_TIMEOUT = 3.5
 TOP_NODES_PER_COUNTRY = 4
-CONCURRENCY_LIMIT = 500
+CONCURRENCY_LIMIT = 150
 
 COUNTRY_MAPPINGS = {
     "TR": ["🇹🇷", r"\bTR\b", r"\bTURKEY\b", r"\.tr$"],
@@ -145,24 +145,25 @@ async def validate_node(node, semaphore):
         start_time = time.time()
 
         try:
-            reader, writer = await asyncio.wait_for(
-                asyncio.open_connection(ip, port), timeout=CONNECTION_TIMEOUT
-            )
+            requires_tls = port in [443, 8443, 2053, 2083, 2087, 2096] or 'vless' in node['protocol'] or 'trojan' in node['protocol']
             
-            if port in [443, 8443, 2053, 2083, 2087, 2096] or 'vless' in node['protocol'] or 'trojan' in node['protocol']:
+            if requires_tls:
                 context = ssl.create_default_context()
                 context.check_hostname = False
                 context.verify_mode = ssl.CERT_NONE
                 
-                try:
-                    await asyncio.wait_for(
-                        loop.start_tls(writer, reader, context, server_hostname=sni if sni else ip),
-                        timeout=CONNECTION_TIMEOUT
-                    )
-                except Exception:
-                    writer.close()
-                    return None
-
+                valid_sni = sni if sni and not re.match(r"^\d{1,3}(\.\d{1,3}){3}$", sni) else None
+                
+                reader, writer = await asyncio.wait_for(
+                    asyncio.open_connection(ip, port, ssl=context, server_hostname=valid_sni),
+                    timeout=CONNECTION_TIMEOUT
+                )
+            else:
+                reader, writer = await asyncio.wait_for(
+                    asyncio.open_connection(ip, port),
+                    timeout=CONNECTION_TIMEOUT
+                )
+                
             writer.close()
             await writer.wait_closed()
 
@@ -207,14 +208,12 @@ async def resolve_fallback_countries(nodes):
     return nodes
 
 async def main():
-    global loop
-    loop = asyncio.get_running_loop()
     raw_links = []
 
     async with aiohttp.ClientSession() as session:
         for url in SOURCES:
             try:
-                async with session.get(url, timeout=5) as response:
+                async with session.get(url, timeout=6) as response:
                     if response.status == 200:
                         text = await response.text()
                         if "://" not in text:
