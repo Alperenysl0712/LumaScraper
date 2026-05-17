@@ -34,6 +34,7 @@ import time
 import json
 import re
 import sys
+import urllib.parse
 
 SOURCES = [
     "https://raw.githubusercontent.com/mahdibland/ShadowsocksAggregator/master/Eternity",
@@ -47,6 +48,21 @@ CONNECTION_TIMEOUT = 1.5
 TOP_NODES_PER_COUNTRY = 3
 CONCURRENCY_LIMIT = 500
 
+COUNTRY_MAPPINGS = {
+    "TR": ["🇹🇷", r"\bTR\b", r"\bTURKEY\b"],
+    "US": ["🇺🇸", r"\bUS\b", r"\bUSA\b"],
+    "DE": ["🇩🇪", r"\bDE\b", r"\bGERMANY\b"],
+    "FR": ["🇫🇷", r"\bFR\b", r"\bFRANCE\b"],
+    "GB": ["🇬🇧", r"\bGB\b", r"\bUK\b", r"\bENGLAND\b"],
+    "NL": ["🇳🇱", r"\bNL\b", r"\bNETHERLANDS\b"],
+    "SG": ["🇸🇬", r"\bSG\b", r"\bSINGAPORE\b"],
+    "JP": ["🇯🇵", r"\bJP\b", r"\bJAPAN\b"],
+    "CA": ["🇨🇦", r"\bCA\b", r"\bCANADA\b"],
+    "AU": ["🇦🇺", r"\bAU\b", r"\bAUSTRALIA\b"],
+    "IT": ["🇮🇹", r"\bIT\b", r"\bITALY\b"],
+    "ES": ["🇪🇸", r"\bES\b", r"\bSPAIN\b"]
+}
+
 
 def decode_base64(data):
     try:
@@ -56,6 +72,20 @@ def decode_base64(data):
         return base64.b64decode(data).decode('utf-8')
     except Exception:
         return data
+
+
+def detect_country_from_remark(link):
+    if '#' not in link:
+        return None
+    
+    remark = link.split('#', 1)[1]
+    remark = urllib.parse.unquote(remark).upper()
+
+    for country_code, patterns in COUNTRY_MAPPINGS.items():
+        for pattern in patterns:
+            if re.search(pattern, remark):
+                return country_code
+    return None
 
 
 def parse_config(link):
@@ -73,8 +103,16 @@ def parse_config(link):
 
         ip = match.group(1)
         port = int(match.group(2))
+        
+        extracted_country = detect_country_from_remark(link)
 
-        return {"link": link, "protocol": protocol, "ip": ip, "port": port}
+        return {
+            "link": link, 
+            "protocol": protocol, 
+            "ip": ip, 
+            "port": port,
+            "country": extracted_country 
+        }
     except Exception:
         return None
 
@@ -109,11 +147,12 @@ async def check_real_internet(node):
     return False
 
 
-async def resolve_real_countries(nodes):
-    if not nodes:
-        return []
+async def resolve_fallback_countries(nodes):
+    unknown_nodes = [n for n in nodes if n['country'] is None]
+    if not unknown_nodes:
+        return nodes
 
-    ips = list(set([n['ip'] for n in nodes]))
+    ips = list(set([n['ip'] for n in unknown_nodes]))
     ip_to_country = {}
     chunks = [ips[i:i + 100] for i in range(0, len(ips), 100)]
 
@@ -133,18 +172,15 @@ async def resolve_real_countries(nodes):
             except Exception:
                 pass
 
-    resolved_nodes = []
     for n in nodes:
-        cc = ip_to_country.get(n['ip'])
-        if cc:
-            n['country'] = cc
-            resolved_nodes.append(n)
+        if n['country'] is None:
+            n['country'] = ip_to_country.get(n['ip'], 'UN')
 
-    return resolved_nodes
+    return nodes
 
 
 async def main():
-    print("Starting Luma Shield Premium Scraper with GeoIP Verification...")
+    print("Starting Luma Shield Premium Scraper with Hybrid Egress Detection...")
     raw_links = []
 
     async with aiohttp.ClientSession() as session:
@@ -183,12 +219,15 @@ async def main():
         if await check_real_internet(node):
             vip_nodes.append(node)
 
-    print(f"Resolving real physical locations for {len(vip_nodes)} VIP nodes...")
-    verified_nodes = await resolve_real_countries(vip_nodes)
+    print(f"Resolving physical egress locations for {len(vip_nodes)} VIP nodes...")
+    verified_nodes = await resolve_fallback_countries(vip_nodes)
 
     country_pools = {}
     for node in verified_nodes:
         c = node['country']
+        if c == 'UN':
+            continue
+            
         if c not in country_pools:
             country_pools[c] = []
         country_pools[c].append(node)
@@ -213,7 +252,7 @@ async def main():
     with open('luma_premium_nodes.json', 'w', encoding='utf-8') as f:
         json.dump(json_output, f, ensure_ascii=False, indent=2)
 
-    print(f"Process complete! {total_saved} location-verified nodes exported.")
+    print(f"Process complete! {total_saved} egress-verified nodes exported.")
 
 
 if __name__ == "__main__":
