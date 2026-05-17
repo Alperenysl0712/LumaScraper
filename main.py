@@ -41,10 +41,10 @@ SOURCES = [
     "https://raw.githubusercontent.com/Leon406/Sub/master/sub/configs.txt"
 ]
 
-MAX_PING_MS = 150
+MAX_PING_MS = 250
 CONNECTION_TIMEOUT = 1.5
 TOP_NODES_PER_COUNTRY = 3
-CONCURRENCY_LIMIT = 500
+CONCURRENCY_LIMIT = 400
 
 COUNTRY_MAPPINGS = {
     "TR": ["🇹🇷", r"\bTR\b", r"\bTURKEY\b", r"\.tr$"],
@@ -61,7 +61,6 @@ COUNTRY_MAPPINGS = {
     "ES": ["🇪🇸", r"\bES\b", r"\bSPAIN\b", r"\.es$"]
 }
 
-
 def decode_base64(data):
     try:
         missing_padding = len(data) % 4
@@ -71,12 +70,7 @@ def decode_base64(data):
     except Exception:
         return data
 
-
 def predict_true_egress(link, ip):
-    """
-    Predicts the true egress country by analyzing the URI remark and SNI/Host.
-    This overrides standard GeoIP to combat CDN Anycast illusions.
-    """
     try:
         uri = urllib.parse.urlparse(link)
         remark = urllib.parse.unquote(uri.fragment).upper()
@@ -96,11 +90,11 @@ def predict_true_egress(link, ip):
     
     return None
 
-
 def parse_config(link):
     try:
         link = link.strip()
-        if not link: return None
+        if not link: 
+            return None
 
         protocol = link.split('://')[0].lower()
         if protocol not in ['vless', 'vmess', 'trojan', 'ss']:
@@ -108,7 +102,8 @@ def parse_config(link):
 
         if protocol != 'vmess':
             match = re.search(r'@([^:]+):(\d+)', link)
-            if not match: return None
+            if not match: 
+                return None
             ip = match.group(1)
             port = int(match.group(2))
         else:
@@ -125,7 +120,6 @@ def parse_config(link):
         }
     except Exception:
         return None
-
 
 async def check_tcp_latency(node, semaphore):
     async with semaphore:
@@ -145,9 +139,8 @@ async def check_tcp_latency(node, semaphore):
                 node['ping'] = latency
                 return node
             return None
-        except Exception:
+        except (asyncio.TimeoutError, Exception):
             return None
-
 
 async def resolve_fallback_countries(nodes):
     unknown_nodes = [n for n in nodes if n['country'] is None]
@@ -171,6 +164,7 @@ async def resolve_fallback_countries(nodes):
                         for item in data:
                             if item.get('status') == 'success':
                                 ip_to_country[item['query']] = item.get('countryCode')
+                await asyncio.sleep(1.5)
             except Exception:
                 pass
 
@@ -179,7 +173,6 @@ async def resolve_fallback_countries(nodes):
             n['country'] = ip_to_country.get(n['ip'], 'UN')
 
     return nodes
-
 
 async def main():
     print("Starting Luma Shield Premium Scraper with Egress-First Prediction...")
@@ -250,7 +243,6 @@ async def main():
         json.dump(json_output, f, ensure_ascii=False, indent=2)
 
     print(f"Process complete! {total_saved} egress-verified nodes exported.")
-
 
 if __name__ == "__main__":
     if sys.platform == 'win32':
