@@ -1,0 +1,140 @@
+{
+  "US": [
+    {
+      "config": "vless://89b3cbba-e6ac-485a-9481-976a0415eab9@147.185.161.229:80?path=Telegram%3A%40S%E2%80%A6%3C/div%3E#%F0%9F%87%BA%F0%9F%87%B8%20US%20%7C%20VLESS%20%7C%20%40msv2raynp%20%232",
+      "countryCode": "US",
+      "countryName": "US",
+      "pingMs": 5
+    },
+    {
+      "config": "vless://89b3cbba-e6ac-485a-9481-976a0415eab9@199.232.0.177:443?type=ws&amp%3Bsecurity=tls&amp%3Bhost=Tahagoogooli.ir&amp%3Bpath=/veNbt06rF0tTFtp6/MTcyLjY0LjEzNC41OA%3D%3D%3Fed%3D2560&amp%3Bfp=randomized&amp%3Bsni=SpEedteST.NET&amp%3Balpn=h2%2Chttp/1.1#%F0%9F%87%BA%F0%9F%87%B8%20US%20%7C%20VLESS%20%7C%20%40buffalo_vpn%20%231",
+      "countryCode": "US",
+      "countryName": "US",
+      "pingMs": 6
+    },
+    {
+      "config": "vless://9c488e6e-932c-44cb-b488-0b27f591b034@151.101.64.155:80?path=/-LiV2ry%40LIGHTNING6-TEL--%40LIGHTNING6-TEL--%40LIGHTNING6-TEL--%40LIGHTNING6-JOIN-%40LIGHTNING6%E2%80%A6%3C/div%3E#%F0%9F%87%BA%F0%9F%87%B8%20US%20%7C%20VLESS%20%7C%20%40msv2raynp%20%231",
+      "countryCode": "US",
+      "countryName": "US",
+      "pingMs": 6
+    }
+  ],
+  "CA": [
+    {
+      "config": "vless://a2dadb95-3f15-4e1c-b517-0b54c336a5fd@104.21.12.150:8443?path=/%3Fed%3D2048&amp%3Bsecurity=tls&amp%3Bencryption=none&amp%3Bhost=nl57.vlessx.us&amp%3Bfp=chrome&amp%3Btype=ws&amp%3Bsni=nl57.Vlessx.us#%F0%9F%87%BD%F0%9F%87%BD%20XX%20%7C%20VLESS%20%7C%20%40goldenshiinevpn%20%232",
+      "countryCode": "CA",
+      "countryName": "CA",
+      "pingMs": 5
+    },
+    {
+      "config": "vless://281a5a7c-6530-4cd6-b0f2-a2666e6c3b36@104.31.16.65:2096?mode=gun&amp%3Bsecurity=tls&amp%3Bencryption=none&amp%3Btype=grpc&amp%3Bsni=tel.v-2rayngvpn.sbs#%F0%9F%87%BD%F0%9F%87%BD%20XX%20%7C%20VLESS%20%7C%20%40mastervpnshop1%20%231",
+      "countryCode": "CA",
+      "countryName": "CA",
+      "pingMs": 5
+    },
+    {
+      "config": "vless://b9ad895b-12ac-40fc-a5ac-a5b2a1285001@172.67.183.26:443?path=/%3Fed%3D2048&amp%3Bsecurity=tls&amp%3Bencryption=none&amp%3Bhost=3k.pureboy.eu.org&amp%3Btype=ws&amp%3Bsni=3k.pureboy.eu.org#%F0%9F%87%BD%F0%9F%87%BD%20XX%20%7C%20VLESS%20%7C%20%40miov2ray%20%232",
+      "countryCode": "CA",
+      "countryName": "CA",
+      "pingMs": 5
+    }
+  ],
+  "GB": [
+    {
+      "config": "vless://e5f8a9f6-f164-479b-b3b5-b90f213c7145@141.101.121.115:2053?path=/&amp%3Bsecurity=tls&amp%3Bencryption=none&amp%3Binsecure=1&amp%3Bhost=ir1.airpanel.top&amp%3Btype=ws&amp%3BallowInsecure=1&amp%3Bsni=ir1.airpanel.top#%F0%9F%87%BD%F0%9F%87%BD%20XX%20%7C%20VLESS%20%7C%20%40vmesc%20%231",
+      "countryCode": "GB",
+      "countryName": "GB",
+      "pingMs": 6
+    },
+    {
+      "config": "ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTppZE12b2V3clN5TEx2RXZQMDNrOXpS@138.68.153.223:46576#%F0%9F%87%AC%F0%9F%87%A7GB-138.68.153.223-0158",
+      "countryCode": "GB",
+      "countryName": "GB",
+      "pingMs": 93
+    },
+    {
+      "config": "ss://YWVzLTEyOC1nY206c2hhZG93c29ja3M=@141.98.101.182:443#%F0%9F%87%AC%F0%9F%87%A7GB-141.98.101.182-0165",
+      "countryCode": "GB",
+      "countryName": "GB",
+      "pingMs": 105
+    }
+  ],
+  "NL": [
+    {
+      "config": "vless://telegram-id-qeshmserver@95.179.138.190:443?type=tcp&amp%3Bsecurity=reality&amp%3Bpbk=ipM5-HQ6sNBZhPGNLNpq8voqMvgxBeL9LDZY4sQ5Yyk&amp%3Bfp=chrome&amp%3Bsni=zula.ir&amp%3Bsid=d2bab77a&amp%3Bspx=/#%F0%9F%87%B3%F0%9F%87%B1%20NL%20%7C%20VLESS%20%7C%20%40qeshmserver%20%231",
+      "countryCode": "NL",
+      "countryName": "NL",
+      "pingMs": 89
+    },
+    {
+      "config": "vless://4fe2b7d6-cdc0-44f3-8093-3a1fc92e8542@95.164.3.121:20089?encryption=none&security=none&type=tcp#%3E%3E%40oneclickvpnkeys%3A%3ANL",
+      "countryCode": "NL",
+      "countryName": "NL",
+      "pingMs": 94
+    },
+    {
+      "config": "ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTpXQzBHYmlDazY3SzhuSERhREhtWUlY@159.223.236.36:19582#%F0%9F%87%B3%F0%9F%87%B1NL-159.223.236.36-0184",
+      "countryCode": "NL",
+      "countryName": "NL",
+      "pingMs": 101
+    }
+  ],
+  "DE": [
+    {
+      "config": "vless://e1034c59-c944-4a60-bdba-8f9cea0324b1@92.223.124.29:443?path=/telegram%3Fed%3D2048&amp%3Bsecurity=tls&amp%3Bencryption=none&amp%3Bhost=zema-brand.ir&amp%3Bfp=randomized&amp%3Btype=ws&amp%3Bsni=speedtest-fr5.gcore.com#%F0%9F%87%A9%F0%9F%87%AA%20DE%20%7C%20VLESS%20%7C%20%40minovpnch%20%231",
+      "countryCode": "DE",
+      "countryName": "DE",
+      "pingMs": 90
+    },
+    {
+      "config": "vless://c19fb567-74a9-454f-9757-e612fc4be371@62.141.32.238:8443?security=reality&amp%3Bencryption=none&amp%3Bpbk=SbVKOEMjK0sIlbwg4akyBg5mL5KZwwB-ed4eEE7YnRc&amp%3BheaderType=none&amp%3Bfp=chrome&amp%3Btype=tcp&amp%3Bflow=xtls-rprx-vision&amp%3Bsni=dropbox.com#%F0%9F%87%A9%F0%9F%87%AA%20DE%20%7C%20VLESS%20%7C%20%40v2raych%20%232",
+      "countryCode": "DE",
+      "countryName": "DE",
+      "pingMs": 90
+    },
+    {
+      "config": "vless://2ee2a715-d541-416a-8713-d66567448c2e@91.99.82.11:443?mode=gun&amp%3Bsecurity=none&amp%3Bencryption=none&amp%3Btype=grpc#%F0%9F%87%A9%F0%9F%87%AA%20DE%20%7C%20VLESS%20%7C%20%40free4allvpn%20%231",
+      "countryCode": "DE",
+      "countryName": "DE",
+      "pingMs": 93
+    }
+  ],
+  "JP": [
+    {
+      "config": "ss://YWVzLTEyOC1nY206c2hhZG93c29ja3M=@149.22.87.204:443#%F0%9F%87%AF%F0%9F%87%B5JP-149.22.87.204-0145",
+      "countryCode": "JP",
+      "countryName": "JP",
+      "pingMs": 172
+    }
+  ],
+  "IT": [
+    {
+      "config": "vless://9f0285ee-20ca-4953-bcdb-86a920652923@204.216.216.23:10086?encryption=none&security=none&type=tcp#%3E%3E%40oneclickvpnkeys%3A%3AIT",
+      "countryCode": "IT",
+      "countryName": "IT",
+      "pingMs": 104
+    },
+    {
+      "config": "ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTpBUmd2R1p5d0ErZ2FjZ0dWMjZCdm11MDUrd1ptUlcvaitBZFUrWjhCdDQ0PQ==@176.126.83.158:990#%F0%9F%87%AE%F0%9F%87%B9IT-176.126.83.158-0199",
+      "countryCode": "IT",
+      "countryName": "IT",
+      "pingMs": 133
+    }
+  ],
+  "ES": [
+    {
+      "config": "ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTpBUmd2R1p5d0ErZ2FjZ0dWMjZCdm11MDUrd1ptUlcvaitBZFUrWjhCdDQ0PQ==@37.143.130.203:990#%F0%9F%87%AA%F0%9F%87%B8ES-37.143.130.203-0215",
+      "countryCode": "ES",
+      "countryName": "ES",
+      "pingMs": 170
+    }
+  ],
+  "FR": [
+    {
+      "config": "vless://401374e6-df77-41fb-f638-dad8184f175b@141.11.203.139:443?security=tls&amp%3Bsni=pqh23v5.hiddendom.shop&amp%3Balpn=h2&amp%3Btype=grpc&amp%3Bencryption=none#%F0%9F%87%AB%F0%9F%87%B7%20FR%20%7C%20VLESS%20%7C%20%40v2ray_collector%20%231",
+      "countryCode": "FR",
+      "countryName": "FR",
+      "pingMs": 6
+    }
+  ]
+}
