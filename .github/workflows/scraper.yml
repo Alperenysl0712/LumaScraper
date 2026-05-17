@@ -1,0 +1,61 @@
+# ==============================================================================
+# Luma Shield - Cloud Proxy Scraper CI/CD Pipeline (Created by Alperen Burak Yeşil)
+# ==============================================================================
+# Description:
+# This GitHub Actions workflow orchestrates the automated execution of the 
+# Luma Shield backend scraper. It ensures the mobile client receives fresh,
+# validated VPN nodes continuously without requiring manual intervention.
+#
+# Architecture & Core Methods:
+# 1. Triggers: Executes periodically via cron (every 6 hours UTC) or manually 
+#    via workflow_dispatch.
+# 2. Concurrency Control: Cancels in-progress runs to prevent git push conflicts 
+#    and save compute minutes if multiple triggers fire simultaneously.
+# 3. Environment: Provisions an ephemeral Ubuntu runner and initializes Python 3.10.
+# 4. Dependency Caching: Caches pip dependencies for faster runner initialization.
+# 5. Execution: Triggers the scraper script to ping and validate nodes.
+# 6. Artifact Persistence: Detects file changes in the JSON output. If new nodes 
+#    are found, it securely commits and pushes the updated JSON back to the repo 
+#    using the default Actions bot identity.
+# ==============================================================================
+
+name: Luma Premium Node Scraper
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: scraper-workflow
+  cancel-in-progress: true
+
+jobs:
+  scrape-and-update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+        cache: 'pip'
+
+    - name: Install Dependencies
+      run: pip install aiohttp
+
+    - name: Run Luma Scraper
+      run: python main.py
+
+    - name: Commit and Push Changes
+      run: |
+        git config --local user.email "github-actions[bot]@users.noreply.github.com"
+        git config --local user.name "github-actions[bot]"
+        git add luma_premium_nodes.json
+        git commit -m "Auto-update: Premium VIP nodes fetched" || exit 0
+        git push
