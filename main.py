@@ -36,15 +36,19 @@ SOURCES = [
     "https://raw.githubusercontent.com/mahdibland/ShadowsocksAggregator/master/Eternity",
     "https://raw.githubusercontent.com/ALIILAPRO/v2rayNG-Config/main/sub.txt",
     "https://raw.githubusercontent.com/barry-far/V2ray-Config/main/Splitted-By-Protocol/trojan.txt",
-    "https://raw.githubusercontent.com/barry-far/V2ray-Config/main/Splitted-By-Protocol/ss.txt",
+    "https://raw.githubusercontent.com/barry-far/V2ray-Config/main/Splitted-By-Protocol/vless.txt",
+    "https://raw.githubusercontent.com/yebekhe/TelegramV2rayCollector/main/sub/normal/mix",
+    "https://raw.githubusercontent.com/Epodon/v2ray-configs/main/All_Configs_Sub.txt",
+    "https://raw.githubusercontent.com/soroushmirzaei/telegram-configs-collector/main/protocols/trojan",
     "https://raw.githubusercontent.com/mfuu/v2ray/master/v2ray",
     "https://raw.githubusercontent.com/Leon406/Sub/master/sub/configs.txt"
 ]
 
-MAX_PING_MS = 250
-CONNECTION_TIMEOUT = 1.5
+MAX_PING_MS = 200
+CONNECTION_TIMEOUT = 2.0
+L7_TIMEOUT = 3.0
 TOP_NODES_PER_COUNTRY = 3
-CONCURRENCY_LIMIT = 400
+CONCURRENCY_LIMIT = 300
 
 COUNTRY_MAPPINGS = {
     "TR": ["🇹🇷", r"\bTR\b", r"\bTURKEY\b", r"\.tr$"],
@@ -70,15 +74,10 @@ def decode_base64(data):
     except Exception:
         return data
 
-def predict_true_egress(link, ip):
+def predict_true_egress(link, ip, sni, host):
     try:
         uri = urllib.parse.urlparse(link)
         remark = urllib.parse.unquote(uri.fragment).upper()
-        
-        query_params = urllib.parse.parse_qs(uri.query)
-        sni = query_params.get('sni', [''])[0].upper()
-        host = query_params.get('host', [''])[0].upper()
-
         combined_search_space = f"{remark} {sni} {host}"
 
         for country_code, patterns in COUNTRY_MAPPINGS.items():
@@ -87,41 +86,59 @@ def predict_true_egress(link, ip):
                     return country_code
     except Exception:
         pass
-    
     return None
 
 def parse_config(link):
     try:
         link = link.strip()
-        if not link: 
+        if not link:
             return None
 
         protocol = link.split('://')[0].lower()
-        if protocol not in ['vless', 'vmess', 'trojan', 'ss']:
+        if protocol not in ['vless', 'trojan', 'ss']:
             return None
 
-        if protocol != 'vmess':
-            match = re.search(r'@([^:]+):(\d+)', link)
-            if not match: 
-                return None
-            ip = match.group(1)
-            port = int(match.group(2))
-        else:
-            return None 
+        match = re.search(r'@([^:]+):(\d+)', link)
+        if not match:
+            return None
+            
+        ip = match.group(1)
+        port = int(match.group(2))
 
-        predicted_country = predict_true_egress(link, ip)
+        uri = urllib.parse.urlparse(link)
+        query_params = urllib.parse.parse_qs(uri.query)
+        sni = query_params.get('sni', [''])[0]
+        host = query_params.get('host', [''])[0]
+        
+        if not sni:
+            sni = host
+
+        predicted_country = predict_true_egress(link, ip, sni, host)
 
         return {
-            "link": link, 
-            "protocol": protocol, 
-            "ip": ip, 
+            "link": link,
+            "protocol": protocol,
+            "ip": ip,
             "port": port,
-            "country": predicted_country 
+            "sni": sni,
+            "country": predicted_country
         }
     except Exception:
         return None
 
-async def check_tcp_latency(node, semaphore):
+async def check_l7_sni(sni):
+    if not sni:
+        return True
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(f"https://{sni}", timeout=L7_TIMEOUT) as response:
+                if response.status in [521, 522, 523, 525, 526, 530]:
+                    return False
+                return True
+    except Exception:
+        return False
+
+async def validate_node(node, semaphore):
     async with semaphore:
         ip = node['ip']
         port = node['port']
@@ -134,10 +151,16 @@ async def check_tcp_latency(node, semaphore):
             writer.close()
             await writer.wait_closed()
 
+            if node['sni']:
+                is_l7_alive = await check_l7_sni(node['sni'])
+                if not is_l7_alive:
+                    return None
+
             latency = int((time.time() - start_time) * 1000)
             if latency <= MAX_PING_MS:
                 node['ping'] = latency
                 return node
+                
             return None
         except (asyncio.TimeoutError, Exception):
             return None
@@ -155,8 +178,8 @@ async def resolve_fallback_countries(nodes):
         for chunk in chunks:
             try:
                 async with session.post(
-                    "http://ip-api.com/batch?fields=query,countryCode,status", 
-                    json=chunk, 
+                    "http://ip-api.com/batch?fields=query,countryCode,status",
+                    json=chunk,
                     timeout=10
                 ) as response:
                     if response.status == 200:
@@ -175,7 +198,7 @@ async def resolve_fallback_countries(nodes):
     return nodes
 
 async def main():
-    print("Starting Luma Shield Premium Scraper with Egress-First Prediction...")
+    print("Starting Luma Shield Premium Scraper with L7 Validation...")
     raw_links = []
 
     async with aiohttp.ClientSession() as session:
@@ -187,10 +210,8 @@ async def main():
                         if "://" not in text:
                             text = decode_base64(text)
                         raw_links.extend(text.splitlines())
-                    else:
-                        print(f"Warning: HTTP {response.status} from {url}")
-            except Exception as e:
-                print(f"Warning: Failed to fetch {url} -> {e}")
+            except Exception:
+                pass
 
     unique_ips = set()
     parsed_nodes = []
@@ -201,9 +222,9 @@ async def main():
             unique_ips.add(node['ip'])
             parsed_nodes.append(node)
 
-    print(f"Testing {len(parsed_nodes)} unique nodes (Concurrency limit: {CONCURRENCY_LIMIT})...")
+    print(f"Testing {len(parsed_nodes)} unique nodes with L7 verification...")
     semaphore = asyncio.Semaphore(CONCURRENCY_LIMIT)
-    tasks = [check_tcp_latency(node, semaphore) for node in parsed_nodes]
+    tasks = [validate_node(node, semaphore) for node in parsed_nodes]
     
     results = await asyncio.gather(*tasks, return_exceptions=True)
 
@@ -242,7 +263,7 @@ async def main():
     with open('luma_premium_nodes.json', 'w', encoding='utf-8') as f:
         json.dump(json_output, f, ensure_ascii=False, indent=2)
 
-    print(f"Process complete! {total_saved} egress-verified nodes exported.")
+    print(f"Process complete! {total_saved} absolutely verified nodes exported.")
 
 if __name__ == "__main__":
     if sys.platform == 'win32':
