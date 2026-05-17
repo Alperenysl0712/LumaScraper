@@ -31,6 +31,7 @@ import json
 import re
 import sys
 import urllib.parse
+import ssl
 
 SOURCES = [
     "https://raw.githubusercontent.com/mahdibland/ShadowsocksAggregator/master/Eternity",
@@ -40,15 +41,25 @@ SOURCES = [
     "https://raw.githubusercontent.com/yebekhe/TelegramV2rayCollector/main/sub/normal/mix",
     "https://raw.githubusercontent.com/Epodon/v2ray-configs/main/All_Configs_Sub.txt",
     "https://raw.githubusercontent.com/soroushmirzaei/telegram-configs-collector/main/protocols/trojan",
+    "https://raw.githubusercontent.com/soroushmirzaei/telegram-configs-collector/main/protocols/vless",
     "https://raw.githubusercontent.com/mfuu/v2ray/master/v2ray",
-    "https://raw.githubusercontent.com/Leon406/Sub/master/sub/configs.txt"
+    "https://raw.githubusercontent.com/Leon406/Sub/master/sub/configs.txt",
+    "https://raw.githubusercontent.com/peasoft/NoMoreWalls/master/list.txt",
+    "https://raw.githubusercontent.com/BoringCat/v2ray-links/master/links.txt",
+    "https://raw.githubusercontent.com/freefq/free/master/v2",
+    "https://raw.githubusercontent.com/tbbatbb/Proxy/master/main/trojan",
+    "https://raw.githubusercontent.com/tbbatbb/Proxy/master/main/vless",
+    "https://raw.githubusercontent.com/Pawdroid/Free-servers/main/sub",
+    "https://raw.githubusercontent.com/aiboboxx/v2rayfree/main/v2",
+    "https://raw.githubusercontent.com/ermaozi/get_subscribe/main/subscribe/v2ray.txt",
+    "https://raw.githubusercontent.com/v2ray-links/v2ray-free/master/v2ray",
+    "https://raw.githubusercontent.com/JlikO/V2Ray-configs/main/All_Configs_Sub.txt"
 ]
 
 MAX_PING_MS = 200
-CONNECTION_TIMEOUT = 2.0
-L7_TIMEOUT = 3.0
-TOP_NODES_PER_COUNTRY = 3
-CONCURRENCY_LIMIT = 300
+CONNECTION_TIMEOUT = 1.5
+TOP_NODES_PER_COUNTRY = 4
+CONCURRENCY_LIMIT = 500
 
 COUNTRY_MAPPINGS = {
     "TR": ["🇹🇷", r"\bTR\b", r"\bTURKEY\b", r"\.tr$"],
@@ -126,47 +137,34 @@ def parse_config(link):
     except Exception:
         return None
 
-async def check_l7_sni(sni):
-    if not sni:
-        return True
-    try:
-        async with aiohttp.ClientSession() as session:
-            async with session.get(f"https://{sni}", timeout=L7_TIMEOUT) as response:
-                if response.status in [521, 522, 523, 525, 526, 530]:
-                    return False
-                return True
-    except Exception:
-        return False
-
-async def check_http_connectivity(ip, port):
-    try:
-        async with aiohttp.ClientSession() as session:
-            async with session.get(f"http://{ip}:{port}", timeout=CONNECTION_TIMEOUT) as response:
-                return response.status < 500
-    except Exception:
-        return False
-
 async def validate_node(node, semaphore):
     async with semaphore:
         ip = node['ip']
         port = node['port']
+        sni = node['sni']
         start_time = time.time()
 
         try:
             reader, writer = await asyncio.wait_for(
                 asyncio.open_connection(ip, port), timeout=CONNECTION_TIMEOUT
             )
+            
+            if port in [443, 8443, 2053, 2083, 2087, 2096] or 'vless' in node['protocol'] or 'trojan' in node['protocol']:
+                context = ssl.create_default_context()
+                context.check_hostname = False
+                context.verify_mode = ssl.CERT_NONE
+                
+                try:
+                    await asyncio.wait_for(
+                        loop.start_tls(writer, reader, context, server_hostname=sni if sni else ip),
+                        timeout=CONNECTION_TIMEOUT
+                    )
+                except Exception:
+                    writer.close()
+                    return None
+
             writer.close()
             await writer.wait_closed()
-            
-            is_http_alive = await check_http_connectivity(ip, port)
-            if not is_http_alive:
-                return None
-
-            if node['sni']:
-                is_l7_alive = await check_l7_sni(node['sni'])
-                if not is_l7_alive:
-                    return None
 
             latency = int((time.time() - start_time) * 1000)
             if latency <= MAX_PING_MS:
@@ -174,7 +172,7 @@ async def validate_node(node, semaphore):
                 return node
                 
             return None
-        except (asyncio.TimeoutError, Exception):
+        except Exception:
             return None
 
 async def resolve_fallback_countries(nodes):
@@ -192,14 +190,13 @@ async def resolve_fallback_countries(nodes):
                 async with session.post(
                     "http://ip-api.com/batch?fields=query,countryCode,status",
                     json=chunk,
-                    timeout=10
+                    timeout=5
                 ) as response:
                     if response.status == 200:
                         data = await response.json()
                         for item in data:
                             if item.get('status') == 'success':
                                 ip_to_country[item['query']] = item.get('countryCode')
-                await asyncio.sleep(1.5)
             except Exception:
                 pass
 
@@ -210,19 +207,21 @@ async def resolve_fallback_countries(nodes):
     return nodes
 
 async def main():
+    global loop
+    loop = asyncio.get_running_loop()
     raw_links = []
 
     async with aiohttp.ClientSession() as session:
         for url in SOURCES:
             try:
-                async with session.get(url, timeout=10) as response:
+                async with session.get(url, timeout=5) as response:
                     if response.status == 200:
                         text = await response.text()
                         if "://" not in text:
                             text = decode_base64(text)
                         raw_links.extend(text.splitlines())
             except Exception:
-                pass
+                continue
 
     unique_ips = set()
     parsed_nodes = []
@@ -238,7 +237,7 @@ async def main():
     
     results = await asyncio.gather(*tasks, return_exceptions=True)
 
-    alive_nodes = [res for res in results if res is not None and not isinstance(res, Exception)]
+    alive_nodes = [res for res in results if isinstance(res, dict)]
 
     verified_nodes = await resolve_fallback_countries(alive_nodes)
 
