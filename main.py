@@ -54,7 +54,7 @@ def decode_base64(data):
         if missing_padding:
             data += '=' * (4 - missing_padding)
         return base64.b64decode(data).decode('utf-8')
-    except KeyError:
+    except Exception:
         return data
 
 
@@ -92,7 +92,7 @@ def parse_config(link):
             country = "GB"
 
         return {"link": link, "protocol": protocol, "ip": ip, "port": port, "country": country}
-    except ConnectionError:
+    except Exception:
         return None
 
 
@@ -114,7 +114,7 @@ async def check_tcp_latency(node, semaphore):
                 node['ping'] = latency
                 return node
             return None
-        except (TimeoutError, OSError):
+        except Exception:
             return None
 
 
@@ -156,9 +156,10 @@ async def main():
     print(f"Testing {len(parsed_nodes)} unique nodes (Concurrency limit: {CONCURRENCY_LIMIT})...")
     semaphore = asyncio.Semaphore(CONCURRENCY_LIMIT)
     tasks = [check_tcp_latency(node, semaphore) for node in parsed_nodes]
-    results = await asyncio.gather(*tasks)
+    
+    results = await asyncio.gather(*tasks, return_exceptions=True)
 
-    alive_nodes = [res for res in results if res is not None]
+    alive_nodes = [res for res in results if res is not None and not isinstance(res, Exception)]
 
     vip_nodes = []
     for node in alive_nodes:
@@ -177,7 +178,6 @@ async def main():
 
     for country, nodes in country_pools.items():
         nodes.sort(key=lambda x: x['ping'])
-
         top_nodes = nodes[:TOP_NODES_PER_COUNTRY]
 
         json_output[country] = []
@@ -198,6 +198,5 @@ async def main():
 
 if __name__ == "__main__":
     if sys.platform == 'win32':
-        asyncio.run(main(), loop_factory=asyncio.SelectorEventLoop)
-    else:
-        asyncio.run(main())
+        asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+    asyncio.run(main())
