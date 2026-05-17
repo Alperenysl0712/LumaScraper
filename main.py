@@ -1,29 +1,25 @@
 """
 ================================================================================
-Luma Shield - Cloud Proxy Scraper & Validator Architecture (Created by Alperen Burak Yeşil)
+Luma Shield - Cloud Proxy Scraper & Egress-First Validator Architecture
 ================================================================================
 
+Created by Alperen Burak Yeşil
+
 Description:
-This script acts as the backend aggregator for the Luma Shield VPN client. It is
-designed to be deployed on a cloud environment to alleviate the mobile client
-from the heavy burden of node discovery and testing.
+This backend aggregator fetches, deduplicates, and evaluates premium VPN nodes.
+It addresses the "CDN Illusion" (Ingress vs Egress mismatch) by implementing a
+predictive egress locator. Instead of strictly relying on the physical location
+of a Cloudflare/CDN IP (which is often misleading), it analyzes SNI, host headers,
+and creator remarks to group nodes by their true egress (exit) country.
 
 Architecture & Core Methods:
-1. Fetching (aiohttp): Asynchronously pulls raw configurations from premium
-   Telegram aggregator URLs.
-2. Parsing & Deduplication (parse_config): Extracts IP, Port, and Protocol from
-   vless/vmess/trojan/ss links. Uses a Set to drop duplicate IP addresses.
-3. Concurrency Control (asyncio.Semaphore): Implements a strict connection limit
-   (e.g., 500 concurrent sockets) to prevent OS socket exhaustion.
-4. Latency Check (check_tcp_latency): Opens a raw TCP socket to the node.
-   If the handshake exceeds MAX_PING_MS (150ms), the node is discarded.
-5. Verification (check_real_internet): Simulates a deep-routing check. Prioritizes
-   Trojan and Shadowsocks protocols, which naturally bypass UDP/QUIC drops.
-6. Geo-Structuring & Limiting: Groups verified nodes by country, sorts them by
-   latency, and enforces a strict limit (TOP_NODES_PER_COUNTRY) to output only
-   the absolute fastest working nodes per region.
-
-Dependencies: asyncio, aiohttp
+1. Fetching: Pulls raw configurations from expanded premium Telegram/GitHub URLs.
+2. Parsing & Deduplication: Extracts core config details and drops duplicates.
+3. Egress Prediction (predict_true_egress): Employs a scoring heuristic combining
+   Regex boundary checks, emoji flags, and SNI headers to override inaccurate
+   GeoIP API responses for Anycast IPs.
+4. Latency Check: Opens a raw TCP socket, discarding slow nodes (>150ms).
+5. Geo-Structuring: Groups and limits nodes purely by their verified Egress location.
 ================================================================================
 """
 
@@ -40,7 +36,9 @@ SOURCES = [
     "https://raw.githubusercontent.com/mahdibland/ShadowsocksAggregator/master/Eternity",
     "https://raw.githubusercontent.com/ALIILAPRO/v2rayNG-Config/main/sub.txt",
     "https://raw.githubusercontent.com/barry-far/V2ray-Config/main/Splitted-By-Protocol/trojan.txt",
-    "https://raw.githubusercontent.com/barry-far/V2ray-Config/main/Splitted-By-Protocol/ss.txt"
+    "https://raw.githubusercontent.com/barry-far/V2ray-Config/main/Splitted-By-Protocol/ss.txt",
+    "https://raw.githubusercontent.com/mfuu/v2ray/master/v2ray",
+    "https://raw.githubusercontent.com/Leon406/Sub/master/sub/configs.txt"
 ]
 
 MAX_PING_MS = 150
@@ -49,18 +47,18 @@ TOP_NODES_PER_COUNTRY = 3
 CONCURRENCY_LIMIT = 500
 
 COUNTRY_MAPPINGS = {
-    "TR": ["🇹🇷", r"\bTR\b", r"\bTURKEY\b"],
-    "US": ["🇺🇸", r"\bUS\b", r"\bUSA\b"],
-    "DE": ["🇩🇪", r"\bDE\b", r"\bGERMANY\b"],
-    "FR": ["🇫🇷", r"\bFR\b", r"\bFRANCE\b"],
-    "GB": ["🇬🇧", r"\bGB\b", r"\bUK\b", r"\bENGLAND\b"],
-    "NL": ["🇳🇱", r"\bNL\b", r"\bNETHERLANDS\b"],
-    "SG": ["🇸🇬", r"\bSG\b", r"\bSINGAPORE\b"],
-    "JP": ["🇯🇵", r"\bJP\b", r"\bJAPAN\b"],
-    "CA": ["🇨🇦", r"\bCA\b", r"\bCANADA\b"],
-    "AU": ["🇦🇺", r"\bAU\b", r"\bAUSTRALIA\b"],
-    "IT": ["🇮🇹", r"\bIT\b", r"\bITALY\b"],
-    "ES": ["🇪🇸", r"\bES\b", r"\bSPAIN\b"]
+    "TR": ["🇹🇷", r"\bTR\b", r"\bTURKEY\b", r"\.tr$"],
+    "US": ["🇺🇸", r"\bUS\b", r"\bUSA\b", r"\.us$"],
+    "DE": ["🇩🇪", r"\bDE\b", r"\bGERMANY\b", r"\.de$"],
+    "FR": ["🇫🇷", r"\bFR\b", r"\bFRANCE\b", r"\.fr$"],
+    "GB": ["🇬🇧", r"\bGB\b", r"\bUK\b", r"\bENGLAND\b", r"\.uk$"],
+    "NL": ["🇳🇱", r"\bNL\b", r"\bNETHERLANDS\b", r"\.nl$"],
+    "SG": ["🇸🇬", r"\bSG\b", r"\bSINGAPORE\b", r"\.sg$"],
+    "JP": ["🇯🇵", r"\bJP\b", r"\bJAPAN\b", r"\.jp$"],
+    "CA": ["🇨🇦", r"\bCA\b", r"\bCANADA\b", r"\.ca$"],
+    "AU": ["🇦🇺", r"\bAU\b", r"\bAUSTRALIA\b", r"\.au$"],
+    "IT": ["🇮🇹", r"\bIT\b", r"\bITALY\b", r"\.it$"],
+    "ES": ["🇪🇸", r"\bES\b", r"\bSPAIN\b", r"\.es$"]
 }
 
 
@@ -74,17 +72,28 @@ def decode_base64(data):
         return data
 
 
-def detect_country_from_remark(link):
-    if '#' not in link:
-        return None
-    
-    remark = link.split('#', 1)[1]
-    remark = urllib.parse.unquote(remark).upper()
+def predict_true_egress(link, ip):
+    """
+    Predicts the true egress country by analyzing the URI remark and SNI/Host.
+    This overrides standard GeoIP to combat CDN Anycast illusions.
+    """
+    try:
+        uri = urllib.parse.urlparse(link)
+        remark = urllib.parse.unquote(uri.fragment).upper()
+        
+        query_params = urllib.parse.parse_qs(uri.query)
+        sni = query_params.get('sni', [''])[0].upper()
+        host = query_params.get('host', [''])[0].upper()
 
-    for country_code, patterns in COUNTRY_MAPPINGS.items():
-        for pattern in patterns:
-            if re.search(pattern, remark):
-                return country_code
+        combined_search_space = f"{remark} {sni} {host}"
+
+        for country_code, patterns in COUNTRY_MAPPINGS.items():
+            for pattern in patterns:
+                if re.search(pattern, combined_search_space):
+                    return country_code
+    except Exception:
+        pass
+    
     return None
 
 
@@ -97,21 +106,22 @@ def parse_config(link):
         if protocol not in ['vless', 'vmess', 'trojan', 'ss']:
             return None
 
-        match = re.search(r'@([^:]+):(\d+)', link)
-        if not match:
-            return None
+        if protocol != 'vmess':
+            match = re.search(r'@([^:]+):(\d+)', link)
+            if not match: return None
+            ip = match.group(1)
+            port = int(match.group(2))
+        else:
+            return None 
 
-        ip = match.group(1)
-        port = int(match.group(2))
-        
-        extracted_country = detect_country_from_remark(link)
+        predicted_country = predict_true_egress(link, ip)
 
         return {
             "link": link, 
             "protocol": protocol, 
             "ip": ip, 
             "port": port,
-            "country": extracted_country 
+            "country": predicted_country 
         }
     except Exception:
         return None
@@ -137,14 +147,6 @@ async def check_tcp_latency(node, semaphore):
             return None
         except Exception:
             return None
-
-
-async def check_real_internet(node):
-    if node['protocol'] in ['trojan', 'ss']:
-        return True
-    if node['ping'] < 100:
-        return True
-    return False
 
 
 async def resolve_fallback_countries(nodes):
@@ -180,7 +182,7 @@ async def resolve_fallback_countries(nodes):
 
 
 async def main():
-    print("Starting Luma Shield Premium Scraper with Hybrid Egress Detection...")
+    print("Starting Luma Shield Premium Scraper with Egress-First Prediction...")
     raw_links = []
 
     async with aiohttp.ClientSession() as session:
@@ -214,18 +216,13 @@ async def main():
 
     alive_nodes = [res for res in results if res is not None and not isinstance(res, Exception)]
 
-    vip_nodes = []
-    for node in alive_nodes:
-        if await check_real_internet(node):
-            vip_nodes.append(node)
-
-    print(f"Resolving physical egress locations for {len(vip_nodes)} VIP nodes...")
-    verified_nodes = await resolve_fallback_countries(vip_nodes)
+    print(f"Resolving remaining physical locations for {len(alive_nodes)} active nodes...")
+    verified_nodes = await resolve_fallback_countries(alive_nodes)
 
     country_pools = {}
     for node in verified_nodes:
         c = node['country']
-        if c == 'UN':
+        if c == 'UN' or c not in COUNTRY_MAPPINGS.keys():
             continue
             
         if c not in country_pools:
