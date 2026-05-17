@@ -4,39 +4,39 @@
       "config": "trojan://humanity@104.16.147.104:443?host=www.creationlong.org&path=%2Fassignment&sni=www.creationlong.org&type=ws#%3E%3E%40oneclickvpnkeys%3A%3APL",
       "countryCode": "CA",
       "countryName": "CA",
-      "pingMs": 12
+      "pingMs": 10
     },
     {
       "config": "trojan://mSzFVhUczD@104.20.5.134:443?allowInsecure=1&alpn=http%2F1.1&host=abest.api-tel.xyz&path=%2F&sni=abest.api-tel.xyz&type=ws#%3E%3E%40oneclickvpnkeys%3A%3AXX",
       "countryCode": "CA",
       "countryName": "CA",
-      "pingMs": 12
+      "pingMs": 10
     },
     {
-      "config": "ss://YWVzLTEyOC1nY206c2hhZG93c29ja3M=@149.22.95.183:443#%40V2raysCollector%20%F0%9F%94%91",
+      "config": "trojan://humanity@104.18.12.149:443?host=www.ignitelimit.com&path=/assignment&sni=www.ignitelimit.com&type=ws#🍥63@oneclickvpnkeys",
       "countryCode": "CA",
       "countryName": "CA",
-      "pingMs": 31
+      "pingMs": 57
     }
   ],
   "US": [
     {
-      "config": "trojan://6202b230-417c-4d8e-b624-0f71afa9c75d@104.17.101.139:443?allowInsecure=1&alpn=http%2F1.1&host=sni.111000.dynv6.net&path=%2F%3Fproxyip%3Dip.111000.de5.net%253A443&sni=sni.111000.dynv6.net&type=ws#%3E%3E%40oneclickvpnkeys%3A%3AUS",
+      "config": "trojan://6202b230-417c-4d8e-b624-0f71afa9c75d@162.159.153.2:443?allowInsecure=1&alpn=http%2F1.1&host=sni.111000.dynv6.net&path=%2F%3Fproxyip%3Dip.111000.de5.net%253A443&sni=sni.111000.dynv6.net&type=ws#%3E%3E%40oneclickvpnkeys%3A%3AUS",
       "countryCode": "US",
       "countryName": "US",
-      "pingMs": 12
+      "pingMs": 8
     },
     {
       "config": "trojan://6202b230-417c-4d8e-b624-0f71afa9c75d@104.16.80.73:443?allowInsecure=1&alpn=http%2F1.1&host=sni.111000.dynv6.net&path=%2F&sni=sni.111000.dynv6.net&type=ws#%3E%3E%40oneclickvpnkeys%3A%3AUS",
       "countryCode": "US",
       "countryName": "US",
-      "pingMs": 12
+      "pingMs": 9
     },
     {
       "config": "trojan://6202b230-417c-4d8e-b624-0f71afa9c75d@104.17.185.207:443?allowInsecure=1&alpn=http%2F1.1&host=sni.111000.dynv6.net&path=%2F%3Fproxyip%3Dip.111000.de5.net%3A443&sni=sni.111000.dynv6.net&type=ws#%3E%3E%40oneclickvpnkeys%3A%3AUS",
       "countryCode": "US",
       "countryName": "US",
-      "pingMs": 12
+      "pingMs": 9
     }
   ],
   "EC": [
@@ -44,97 +44,33 @@
       "config": "ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTpBUmd2R1p5d0ErZ2FjZ0dWMjZCdm11MDUrd1ptUlcvaitBZFUrWjhCdDQ0PQ==@38.165.231.25:990#%F0%9F%87%AA%F0%9F%87%A8EC-38.165.231.25-0098",
       "countryCode": "EC",
       "countryName": "EC",
-      "pingMs": 127
+      "pingMs": 106
     },
     {
       "config": "ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTpBUmd2R1p5d0ErZ2FjZ0dWMjZCdm11MDUrd1ptUlcvaitBZFUrWjhCdDQ0PQ==@185.47.253.227:990#%F0%9F%87%AA%F0%9F%87%A8EC-185.47.253.227-0201",
       "countryCode": "EC",
       "countryName": "EC",
-      "pingMs": 146
-    }
-  ],
-  "PA": [
-    {
-      "config": "ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTpBUmd2R1p5d0ErZ2FjZ0dWMjZCdm11MDUrd1ptUlcvaitBZFUrWjhCdDQ0PQ==@138.186.142.80:990#%F0%9F%87%B5%F0%9F%87%A6PA-138.186.142.80-0109",
-      "countryCode": "PA",
-      "countryName": "PA",
-      "pingMs": 126
-    },
-    {
-      "config": "ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTpBUmd2R1p5d0ErZ2FjZ0dWMjZCdm11MDUrd1ptUlcvaitBZFUrWjhCdDQ0PQ==@138.186.142.81:990#%F0%9F%87%B5%F0%9F%87%A6PA-138.186.142.81-0107",
-      "countryCode": "PA",
-      "countryName": "PA",
-      "pingMs": 127
-    }
-  ],
-  "JP": [
-    {
-      "config": "ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTp0MHNybWR4cm0zeHlqbnZxejlld2x4YjJteXE3cmp1dg@13.231.29.220:2377/?plugin=obfs-local;obfs=tls;obfs-host=(Telegram🇨🇳+@WangCai2)4a81070:6193#🇯🇵JP_@WangCai_8",
-      "countryCode": "JP",
-      "countryName": "JP",
-      "pingMs": 111
-    },
-    {
-      "config": "ss://YWVzLTEyOC1nY206c2hhZG93c29ja3M=@149.22.87.240:443#🇯🇵 Join+Telegram:@Farah_VPN 🇯🇵",
-      "countryCode": "JP",
-      "countryName": "JP",
-      "pingMs": 112
-    },
-    {
-      "config": "ss://YWVzLTEyOC1nY206c2hhZG93c29ja3M@149.22.87.241:443#🇯🇵 Join+Telegram:@Farah_VPN 🇯🇵",
-      "countryCode": "JP",
-      "countryName": "JP",
-      "pingMs": 114
+      "pingMs": 106
     }
   ],
   "GB": [
     {
-      "config": "ss://YWVzLTI1Ni1nY206bGRqbXdvTnFnUXFxYzQzag==@149.102.132.184:443#%40V2raysCollector%20%F0%9F%8F%88",
-      "countryCode": "GB",
-      "countryName": "GB",
-      "pingMs": 144
-    },
-    {
-      "config": "ss://YWVzLTI1Ni1nY206dW1Xd29RSkVKR2Y3NFNMZQ@149.102.149.207:443#[56807] - Telegram : @V2All",
-      "countryCode": "GB",
-      "countryName": "GB",
-      "pingMs": 144
-    },
-    {
       "config": "ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTprMXY1ZzlGZWZkb08@57.129.140.88:8388#IR-@V2rayAlpha-1",
       "countryCode": "GB",
       "countryName": "GB",
-      "pingMs": 146
-    }
-  ],
-  "TW": [
-    {
-      "config": "ss://YWVzLTI1Ni1jZmI6cXdlclJFV1FAQA==@185.189.160.105:41632#%F0%9F%87%B9%F0%9F%87%BCTW-185.189.160.105-0139",
-      "countryCode": "TW",
-      "countryName": "TW",
-      "pingMs": 146
+      "pingMs": 81
     },
     {
-      "config": "ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTpBUmd2R1p5d0ErZ2FjZ0dWMjZCdm11MDUrd1ptUlcvaitBZFUrWjhCdDQ0PQ@38.54.107.101:990#%3E%3E%40OutlineVpnOfficial%3A%3ATW",
-      "countryCode": "TW",
-      "countryName": "TW",
-      "pingMs": 147
-    }
-  ],
-  "CO": [
+      "config": "ss://YWVzLTI1Ni1nY206WWh6cU9lSnNmdVo5cmtrYw@149.102.132.186:80?note=--Telegram--@NetifyVPN--#%40V2raysCollector%20%F0%9F%92%A9%3D%F0%9F%91%B3",
+      "countryCode": "GB",
+      "countryName": "GB",
+      "pingMs": 91
+    },
     {
-      "config": "ss://YWVzLTI1Ni1jZmI6ZjhmN2FDemNQS2JzRjhwMw==@154.223.16.212:989#%F0%9F%87%A8%F0%9F%87%B4CO-154.223.16.212-0177",
-      "countryCode": "CO",
-      "countryName": "CO",
-      "pingMs": 121
-    }
-  ],
-  "KR": [
-    {
-      "config": "ss://YWVzLTI1Ni1nY206VEV6amZBWXEySWp0dW9T@141.164.45.187:6679#%F0%9F%87%B0%F0%9F%87%B7KR-141.164.45.187-0197",
-      "countryCode": "KR",
-      "countryName": "KR",
-      "pingMs": 147
+      "config": "ss://YWVzLTI1Ni1nY206dW1Xd29RSkVKR2Y3NFNMZQ@149.102.149.207:443#%3E%3E%40oneclickvpnkeys%3A%3AGB",
+      "countryCode": "GB",
+      "countryName": "GB",
+      "pingMs": 95
     }
   ],
   "NL": [
@@ -142,39 +78,259 @@
       "config": "trojan://humanity@104.18.32.37:443?security=tls&sni=www.gossipglove.com&fp=chrome&allowInsecure=1&type=ws&path=%2Fassignment#%3E%3E%40v2line%3A%3ANL",
       "countryCode": "NL",
       "countryName": "NL",
-      "pingMs": 12
+      "pingMs": 10
     },
     {
       "config": "trojan://humanity@172.64.147.24:443?allowInsecure=1&host=www.gossipglove.com&path=%2Fassignment&sni=www.gossipglove.com&type=ws#%3E%3E%40oneclickvpnkeys%3A%3ANL",
       "countryCode": "NL",
       "countryName": "NL",
-      "pingMs": 12
+      "pingMs": 10
     },
     {
       "config": "trojan://humanity@162.159.17.189:443?allowInsecure=1&host=www.multiplydose.com&path=%2Fassignment&sni=www.multiplydose.com&type=ws#%3E%3E%40oneclickvpnkeys%3A%3ANL",
       "countryCode": "NL",
       "countryName": "NL",
-      "pingMs": 12
+      "pingMs": 10
+    }
+  ],
+  "AR": [
+    {
+      "config": "ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTpBUmd2R1p5d0ErZ2FjZ0dWMjZCdm11MDUrd1ptUlcvaitBZFUrWjhCdDQ0PQ==@190.103.176.32:990#%F0%9F%87%A6%F0%9F%87%B7AR-190.103.176.32-0110",
+      "countryCode": "AR",
+      "countryName": "AR",
+      "pingMs": 150
+    }
+  ],
+  "PA": [
+    {
+      "config": "ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTpBUmd2R1p5d0ErZ2FjZ0dWMjZCdm11MDUrd1ptUlcvaitBZFUrWjhCdDQ0PQ==@138.186.142.80:990#%F0%9F%87%B5%F0%9F%87%A6PA-138.186.142.80-0109",
+      "countryCode": "PA",
+      "countryName": "PA",
+      "pingMs": 87
+    },
+    {
+      "config": "ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTpBUmd2R1p5d0ErZ2FjZ0dWMjZCdm11MDUrd1ptUlcvaitBZFUrWjhCdDQ0PQ==@138.186.142.81:990#%F0%9F%87%B5%F0%9F%87%A6PA-138.186.142.81-0107",
+      "countryCode": "PA",
+      "countryName": "PA",
+      "pingMs": 87
+    }
+  ],
+  "MT": [
+    {
+      "config": "ss://YWVzLTI1Ni1jZmI6ZjhmN2FDemNQS2JzRjhwMw==@171.22.254.17:989#%F0%9F%87%B2%F0%9F%87%B9MT-171.22.254.17-0112",
+      "countryCode": "MT",
+      "countryName": "MT",
+      "pingMs": 126
+    }
+  ],
+  "LV": [
+    {
+      "config": "ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTpBUmd2R1p5d0ErZ2FjZ0dWMjZCdm11MDUrd1ptUlcvaitBZFUrWjhCdDQ0PQ==@46.183.217.204:990#%F0%9F%87%B1%F0%9F%87%BBLV-46.183.217.204-0113",
+      "countryCode": "LV",
+      "countryName": "LV",
+      "pingMs": 121
+    },
+    {
+      "config": "trojan://162534@195.123.209.189:8443?allowInsecure=1&ed=2560&eh=Sec-WebSocket-Protocol&fp=chrome&host=cchh2.pages.dev&path=/?https://t.me/WangCai2🇨🇳=&sni=cchh2.pages.dev&type=ws#🍥86@oneclickvpnkeys",
+      "countryCode": "LV",
+      "countryName": "LV",
+      "pingMs": 148
+    }
+  ],
+  "FI": [
+    {
+      "config": "ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTp5S1ZNb0IzQXdpVEV6bnBub3EyRllS@193.47.60.186:28687#%F0%9F%87%AB%F0%9F%87%AEFI-193.47.60.186-0125",
+      "countryCode": "FI",
+      "countryName": "FI",
+      "pingMs": 117
+    },
+    {
+      "config": "ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTpiWjg3YW1QcGRHN0t1V002MmJLdG0xS0hvb3d1VmpuVjhDS3RxNjUzeW1IY2cyZFBZY1BKZm5hUTYxc3R1QWpyMlppTERhcUg1Nlhwa3hFWXV3RHp6UnJNV2llZWJXR3Q=@185.5.38.111:55988#%3E%3E%40v2ray_configs_pool%3A%3AXX",
+      "countryCode": "FI",
+      "countryName": "FI",
+      "pingMs": 135
+    },
+    {
+      "config": "trojan://8r<[9'l6hAO#8ZQi@87.251.16.237:8443?host=Koma-YT.PAGeS.Dev&path=/trTelegram🇨🇳+@WangCai2&security=tls&sni=Koma-YT.PAGeS.Dev&type=ws#@v2rayconfigamir 6712",
+      "countryCode": "FI",
+      "countryName": "FI",
+      "pingMs": 142
     }
   ],
   "DE": [
     {
-      "config": "trojan://1111@104.18.32.75:2083?path=/?ed=2560&security=tls&host=v2ngfast-v2ngfast-v2ngfast-v2ngfast.wijahol963.workers.dev&fp=chrome&type=ws&sni=v2ngfast-v2ngfast-v2ngfast-v2ngfast.wijahol963.workers.dev#1 🇩🇪 @V2ngFast",
+      "config": "vless://3f0f36f5-f091-45c5-88c9-4bcc545b922c@108.162.193.91:2096?path=%2F45.76.183.217%3D49292&security=tls&encryption=none&insecure=0&host=hetz.x-smm.com&type=ws&allowInsecure=0&sni=hetz.x-smm.com#%F0%9F%87%A9%F0%9F%87%AA%20WS-TLS%20%E2%9A%A1Telegram%20%3D%20%40KIA_NET```",
       "countryCode": "DE",
       "countryName": "DE",
-      "pingMs": 70
+      "pingMs": 58
     },
     {
-      "config": "trojan://1111@104.18.34.41:2087?path=/?ed=2560&security=tls&host=v2ngfast-v2ngfast-v2ngfast-v2ngfast.sedac13124.workers.dev&fp=chrome&type=ws&sni=v2ngfast-v2ngfast-v2ngfast-v2ngfast.sedac13124.workers.dev#5 🇩🇪 @V2ngFast",
+      "config": "vless://060a8fe8-7175-4ded-94a5-d9808bc645b6@104.18.35.85:443?path=%2F&security=tls&encryption=none&host=cf.vless.sandesh.fr&fp=chrome&type=ws&sni=cf.vless.sandesh.fr#%F0%9F%87%A9%F0%9F%87%AA%20King%20%F0%9F%91%91",
       "countryCode": "DE",
       "countryName": "DE",
-      "pingMs": 70
+      "pingMs": 58
     },
     {
-      "config": "trojan://1111@108.162.198.151:443?path=/?ed=2560&security=tls&host=v2ngfast-v2ngfast-v2ngfast-v2ngfast.pifirib369.workers.dev&fp=chrome&type=ws&sni=v2ngfast-v2ngfast-v2ngfast-v2ngfast.pifirib369.workers.dev#10 🇩🇪 @V2ngFast",
+      "config": "vless://0261c8f9-413a-455b-942b-3713c6b0084a@172.66.40.99:443?path=%2F%40V2RAYFAST_7%40V2RAYFAST_7%40V2RAYFAST_7%40V2RAYFAST_7%40V2RAYFAST_7%40V2RAYFAST_7%40V2RAYFAST_7%40V2RAYFAST_7%40V2RAYFAST_7%40V2RAYFAST_7%40V2RAYFAST_7%40V2RAYFAST_7%40V2RAYFAST_7%40V2RAYFAST_7%40V2RAYFAST_7%40V2RAYFAST_7%40V2RAYFAST_7%40V2RAYFAST_7%40V2RAYFAST_7%40V2RAYFAST_7%40V2RAYFAST_7%40V2RAYFAST_7%40V2RAYFAST_7%40V2RAYFAST_7%3Fed%3D2048&security=tls&alpn=h2%2Chttp%2F1.1&encryption=none&host=www.dollardoon.com&fp=chrome&type=ws&sni=www.dollardoon.com#%F0%9F%87%A9%F0%9F%87%AA%20DE%20%F0%9F%97%BF",
       "countryCode": "DE",
       "countryName": "DE",
-      "pingMs": 70
+      "pingMs": 58
+    }
+  ],
+  "PT": [
+    {
+      "config": "ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTpBUmd2R1p5d0ErZ2FjZ0dWMjZCdm11MDUrd1ptUlcvaitBZFUrWjhCdDQ0PQ==@185.113.143.186:990#%F0%9F%87%B5%F0%9F%87%B9PT-185.113.143.186-0138",
+      "countryCode": "PT",
+      "countryName": "PT",
+      "pingMs": 129
+    }
+  ],
+  "DK": [
+    {
+      "config": "ss://YWVzLTI1Ni1jZmI6ZjhmN2FDemNQS2JzRjhwMw==@192.36.27.94:989#%F0%9F%87%A9%F0%9F%87%B0DK-192.36.27.94-0160",
+      "countryCode": "DK",
+      "countryName": "DK",
+      "pingMs": 110
+    }
+  ],
+  "MK": [
+    {
+      "config": "ss://YWVzLTI1Ni1jZmI6ZjhmN2FDemNQS2JzRjhwMw==@46.183.185.37:989#%F0%9F%87%B2%F0%9F%87%B0MK-46.183.185.37-0182",
+      "countryCode": "MK",
+      "countryName": "MK",
+      "pingMs": 136
+    }
+  ],
+  "CO": [
+    {
+      "config": "ss://YWVzLTI1Ni1jZmI6ZjhmN2FDemNQS2JzRjhwMw==@154.223.16.212:989#%F0%9F%87%A8%F0%9F%87%B4CO-154.223.16.212-0177",
+      "countryCode": "CO",
+      "countryName": "CO",
+      "pingMs": 82
+    }
+  ],
+  "IT": [
+    {
+      "config": "ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTpBUmd2R1p5d0ErZ2FjZ0dWMjZCdm11MDUrd1ptUlcvaitBZFUrWjhCdDQ0PQ==@176.126.83.158:990#%F0%9F%87%AE%F0%9F%87%B9IT-176.126.83.158-0190",
+      "countryCode": "IT",
+      "countryName": "IT",
+      "pingMs": 116
+    }
+  ],
+  "PE": [
+    {
+      "config": "ss://YWVzLTI1Ni1jZmI6ZjhmN2FDemNQS2JzRjhwMw==@138.186.143.32:989#%F0%9F%87%B5%F0%9F%87%AAPE-138.186.143.32-0186",
+      "countryCode": "PE",
+      "countryName": "PE",
+      "pingMs": 135
+    }
+  ],
+  "AT": [
+    {
+      "config": "trojan://trojan@152.53.45.251:8888?security=tls&amp%3Bsni=jflsjlaf.pages.dev&amp%3Btype=ws&amp%3Bhost=jflsjlaf.pages.dev&amp%3Bpath=/#%F0%9F%87%A6%F0%9F%87%B9%20AT%20%7C%20TROJAN%20%7C%20%40mpproxy%20%231",
+      "countryCode": "AT",
+      "countryName": "AT",
+      "pingMs": 105
+    },
+    {
+      "config": "ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTpBUmd2R1p5d0ErZ2FjZ0dWMjZCdm11MDUrd1ptUlcvaitBZFUrWjhCdDQ0PQ==@37.235.56.69:990#%F0%9F%87%A6%F0%9F%87%B9AT-37.235.56.69-0172",
+      "countryCode": "AT",
+      "countryName": "AT",
+      "pingMs": 114
+    }
+  ],
+  "MA": [
+    {
+      "config": "ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTpBUmd2R1p5d0ErZ2FjZ0dWMjZCdm11MDUrd1ptUlcvaitBZFUrWjhCdDQ0PQ==@154.70.207.97:990#%F0%9F%87%B2%F0%9F%87%A6MA-154.70.207.97-0196",
+      "countryCode": "MA",
+      "countryName": "MA",
+      "pingMs": 120
+    },
+    {
+      "config": "ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTpBUmd2R1p5d0ErZ2FjZ0dWMjZCdm11MDUrd1ptUlcvaitBZFUrWjhCdDQ0PQ==@188.214.157.30:990#%F0%9F%87%B2%F0%9F%87%A6MA-188.214.157.30-0204",
+      "countryCode": "MA",
+      "countryName": "MA",
+      "pingMs": 126
+    },
+    {
+      "config": "ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTpBUmd2R1p5d0ErZ2FjZ0dWMjZCdm11MDUrd1ptUlcvaitBZFUrWjhCdDQ0PQ==@188.214.157.58:990#%F0%9F%87%B2%F0%9F%87%A6MA-188.214.157.58-0193",
+      "countryCode": "MA",
+      "countryName": "MA",
+      "pingMs": 136
+    }
+  ],
+  "RU": [
+    {
+      "config": "ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTpYNmJ0YlJ2SkNvM3VUUS0teWFhVDhNdmgwQ2dxaFlUTA@84.38.181.97:8388#🍥85@oneclickvpnkeys",
+      "countryCode": "RU",
+      "countryName": "RU",
+      "pingMs": 119
+    },
+    {
+      "config": "ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTpYNmJ0YlJ2SkNvM3VUUS0teWFhVDhNdmgwQ2dxaFlUTA@77.105.169.188:8388#🍥94@oneclickvpnkeys",
+      "countryCode": "RU",
+      "countryName": "RU",
+      "pingMs": 124
+    },
+    {
+      "config": "ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTpYNmJ0YlJ2SkNvM3VUUS0teWFhVDhNdmgwQ2dxaFlUTA@72.56.235.141:8388#🍥59@oneclickvpnkeys",
+      "countryCode": "RU",
+      "countryName": "RU",
+      "pingMs": 127
+    }
+  ],
+  "SI": [
+    {
+      "config": "ss://YWVzLTI1Ni1jZmI6ZjhmN2FDemNQS2JzRjhwMw==@192.71.244.150:989#%F0%9F%87%B8%F0%9F%87%AESI-192.71.244.150-0180",
+      "countryCode": "SI",
+      "countryName": "SI",
+      "pingMs": 128
+    }
+  ],
+  "BR": [
+    {
+      "config": "ss://YWVzLTI1Ni1jZmI6ZjhmN2FDemNQS2JzRjhwMw==@38.54.57.90:989#%F0%9F%87%A7%F0%9F%87%B7BR-38.54.57.90-0168",
+      "countryCode": "BR",
+      "countryName": "BR",
+      "pingMs": 129
+    }
+  ],
+  "BE": [
+    {
+      "config": "ss://YWVzLTI1Ni1jZmI6ZjhmN2FDemNQS2JzRjhwMw==@192.71.249.78:989#%F0%9F%87%A7%F0%9F%87%AABE-192.71.249.78-0183",
+      "countryCode": "BE",
+      "countryName": "BE",
+      "pingMs": 104
+    }
+  ],
+  "HR": [
+    {
+      "config": "ss://YWVzLTI1Ni1jZmI6ZjhmN2FDemNQS2JzRjhwMw==@46.183.184.60:989#%F0%9F%87%AD%F0%9F%87%B7HR-46.183.184.60-0167",
+      "countryCode": "HR",
+      "countryName": "HR",
+      "pingMs": 123
+    }
+  ],
+  "CL": [
+    {
+      "config": "ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTpBUmd2R1p5d0ErZ2FjZ0dWMjZCdm11MDUrd1ptUlcvaitBZFUrWjhCdDQ0PQ==@154.205.153.107:990#%F0%9F%87%B8%F0%9F%87%A8SC-154.205.153.107-0185",
+      "countryCode": "CL",
+      "countryName": "CL",
+      "pingMs": 135
+    }
+  ],
+  "ES": [
+    {
+      "config": "trojan://humanity@185.18.250.252:443?encryption=none&security=tls&sni=www.multiplydose.com&fp=chrome&insecure=1&type=ws&path=%2Fassignment#v2ray_dalghak",
+      "countryCode": "ES",
+      "countryName": "ES",
+      "pingMs": 58
+    },
+    {
+      "config": "ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTpBUmd2R1p5d0ErZ2FjZ0dWMjZCdm11MDUrd1ptUlcvaitBZFUrWjhCdDQ0PQ==@37.143.130.203:990#%F0%9F%87%AA%F0%9F%87%B8ES-37.143.130.203-0191",
+      "countryCode": "ES",
+      "countryName": "ES",
+      "pingMs": 131
     }
   ],
   "PK": [
@@ -182,7 +338,7 @@
       "config": "vless://49ed01ad-3bb4-204f-b0ff-a58f658fd618@103.175.79.10:443?security=reality&encryption=none&pbk=4e-unF1RO2v--E7-X3aqxnCSPaK9QaTfJ7LawAr2bRI&headerType=none&fp=chrome&type=tcp&flow=xtls-rprx-vision&sni=speed.cloudflare.com#%40v2Meli",
       "countryCode": "PK",
       "countryName": "PK",
-      "pingMs": 73
+      "pingMs": 96
     }
   ],
   "SE": [
@@ -190,7 +346,13 @@
       "config": "vless://Parsashonam-254@185.146.173.39:8880?path=%2F&security=none&encryption=none&host=Search.DigiKala.CYoU.&type=httpupgrade#%40v2Meli",
       "countryCode": "SE",
       "countryName": "SE",
-      "pingMs": 72
+      "pingMs": 60
+    },
+    {
+      "config": "ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTpYNmJ0YlJ2SkNvM3VUUS0teWFhVDhNdmgwQ2dxaFlUTA@150.241.72.79:8388#🐸16@oneclickvpnkeys",
+      "countryCode": "SE",
+      "countryName": "SE",
+      "pingMs": 102
     }
   ],
   "KZ": [
@@ -198,7 +360,7 @@
       "config": "vless://6202b230-417c-4d8e-b624-0f71afa9c75d@194.59.5.238:2096?path=%2F%3Ftelegram%25F0%259F%2587%25A8%25F0%259F%2587%25B3%2B%2540wangcai2%3D&security=tls&encryption=none&insecure=0&host=sni.jpmj.dev&type=ws&allowInsecure=0&sni=sni.jpmj.dev#%E2%9A%A1%E2%9A%A17",
       "countryCode": "KZ",
       "countryName": "KZ",
-      "pingMs": 72
+      "pingMs": 58
     }
   ],
   "FR": [
@@ -206,35 +368,113 @@
       "config": "trojan://humanity@104.17.150.76:443?alpn=http%2F1.1&host=www.calmloud.com&path=%2Fassignment&sni=www.calmloud.com&type=ws#%3E%3E%40oneclickvpnkeys%3A%3AFR",
       "countryCode": "FR",
       "countryName": "FR",
-      "pingMs": 12
+      "pingMs": 10
     },
     {
       "config": "trojan://humanity@104.18.13.149:443/?type=ws&host=www.calmloud.com&path=%2Fassignment&security=tls&sni=www.calmloud.com&alpn=http%2F1.1&allowInsecure=1&fp=chrome#%3E%3E%40oneclickvpnkeys%3A%3AFR",
       "countryCode": "FR",
       "countryName": "FR",
-      "pingMs": 12
+      "pingMs": 10
     },
     {
       "config": "trojan://humanity@8.6.112.6:443?path=%2Fassignment&security=tls&alpn=http%2F1.1&insecure=0&host=www.calmloud.com&fp=chrome&type=ws&allowInsecure=0&sni=www.calmloud.com#%3E%3E%40v2rayNG_Matsuri%3A%3AFR",
       "countryCode": "FR",
       "countryName": "FR",
-      "pingMs": 12
-    }
-  ],
-  "ES": [
-    {
-      "config": "trojan://humanity@185.18.250.252:443?allowInsecure=0&fp=chrome&host=www.gossipglove.com&insecure=0&path=%2Fassignment&security=tls&sni=www.gossipglove.com&type=ws#%40V2raysCollector%20%E2%9D%A3%EF%B8%8F",
-      "countryCode": "ES",
-      "countryName": "ES",
-      "pingMs": 70
+      "pingMs": 10
     }
   ],
   "TR": [
     {
-      "config": "trojan://8r<[9'l6hAO#8ZQi@172.64.149.54:2096?path=/tr&security=tls&host=Koma-YT.PAGeS.Dev&type=ws&sni=Koma-YT.PAGeS.Dev#@Pirimod",
+      "config": "trojan://8r<[9'l6hAO#8ZQi@172.64.149.54:2096?Telegram=@GozargahAzad,@GozargahAzad,@GozargahAzad,@GozargahAzad,@GozargahAzad,@GozargahAzad,@GozargahAzad&path=/tr&security=tls&host=Koma-YT.PAGeS.Dev&type=ws&sni=Koma-YT.PAGeS.Dev#@GozargahAzad|🏁",
       "countryCode": "TR",
       "countryName": "TR",
-      "pingMs": 70
+      "pingMs": 58
+    },
+    {
+      "config": "ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTpYNmJ0YlJ2SkNvM3VUUS0teWFhVDhNdmgwQ2dxaFlUTA@194.87.39.215:8388#🍥72@oneclickvpnkeys",
+      "countryCode": "TR",
+      "countryName": "TR",
+      "pingMs": 129
+    }
+  ],
+  "PL": [
+    {
+      "config": "ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTpwdmd6OXBx@54.36.174.134:443#@v2rayngzendegimamad🕊️",
+      "countryCode": "PL",
+      "countryName": "PL",
+      "pingMs": 113
+    },
+    {
+      "config": "trojan://8r<[9'l6hAO#8ZQi@45.144.51.133:8443?allowInsecure=1&host=Koma-YT.PAGeS.Dev&path=/trTelegram🇨🇳+@WangCai2&sni=Koma-YT.PAGeS.Dev&type=ws#🍥89@oneclickvpnkeys",
+      "countryCode": "PL",
+      "countryName": "PL",
+      "pingMs": 145
+    },
+    {
+      "config": "trojan://8r<[9'l6hAO#8ZQi@91.224.75.127:2053?allowInsecure=1&fp=chrome&host=Koma-YT.PAGeS.Dev&path=/trTelegram🇨🇳+@WangCai2&sni=Koma-YT.PAGeS.Dev&type=ws#🍥98@oneclickvpnkeys",
+      "countryCode": "PL",
+      "countryName": "PL",
+      "pingMs": 145
+    }
+  ],
+  "CZ": [
+    {
+      "config": "trojan://8r<[9'l6hAO#8ZQi@46.229.253.73:8443?host=Koma-YT.PAGeS.Dev&path=/trTelegram🇨🇳+@WangCai2&sni=Koma-YT.PAGeS.Dev&type=ws#[56901] - Telegram : @V2All",
+      "countryCode": "CZ",
+      "countryName": "CZ",
+      "pingMs": 127
+    }
+  ],
+  "LT": [
+    {
+      "config": "ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTpBUmd2R1p5d0ErZ2FjZ0dWMjZCdm11MDUrd1ptUlcvaitBZFUrWjhCdDQ0PQ@185.237.185.89:990?note=Telegram---%40Raiv2mmr---Telegram---%40Raiv2mmr---Telegram---%40Raiv2mmr---Telegram---%40Raiv2mmr---Telegram---%40Raiv2mmr---Telegram---%40Raiv2mmr---Telegram---%40Raiv2mmr---Telegram---%40Raiv2mmr---Telegram---%40Raiv2mmr---#[",
+      "countryCode": "LT",
+      "countryName": "LT",
+      "pingMs": 131
+    }
+  ],
+  "BG": [
+    {
+      "config": "ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTpBUmd2R1p5d0ErZ2FjZ0dWMjZCdm11MDUrd1ptUlcvaitBZFUrWjhCdDQ0PQ==@193.135.174.135:990#@v2rayconfigamir 9912",
+      "countryCode": "BG",
+      "countryName": "BG",
+      "pingMs": 121
+    },
+    {
+      "config": "ss://YWVzLTI1Ni1nY206bEdxczk1UWtGSG8yTlY=@38.180.2.141:5499#@filembad",
+      "countryCode": "BG",
+      "countryName": "BG",
+      "pingMs": 126
+    }
+  ],
+  "CH": [
+    {
+      "config": "ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTpYNmJ0YlJ2SkNvM3VUUS0teWFhVDhNdmgwQ2dxaFlUTA@193.151.108.76:8388#🐸31@oneclickvpnkeys",
+      "countryCode": "CH",
+      "countryName": "CH",
+      "pingMs": 95
+    },
+    {
+      "config": "ss://YWVzLTI1Ni1nY206Y2RCSURWNDJEQ3duZklO@38.180.161.123:8119#%3E%3E%40FreakConfig%3A%3ACH",
+      "countryCode": "CH",
+      "countryName": "CH",
+      "pingMs": 102
+    }
+  ],
+  "RO": [
+    {
+      "config": "ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTpRRld6Q3cydVg5QjlpNnFBWWVGQklF@154.46.31.106:443#%3E%3E%40v2ray_configs_pool%3A%3ARO",
+      "countryCode": "RO",
+      "countryName": "RO",
+      "pingMs": 125
+    }
+  ],
+  "EE": [
+    {
+      "config": "ss://YWVzLTI1Ni1nY206Rm9PaUdsa0FBOXlQRUdQ@38.180.216.114:7307#%3E%3E%40v2ray_configs_pool%3A%3AXX",
+      "countryCode": "EE",
+      "countryName": "EE",
+      "pingMs": 113
     }
   ]
 }
