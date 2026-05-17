@@ -74,24 +74,7 @@ def parse_config(link):
         ip = match.group(1)
         port = int(match.group(2))
 
-        country = "UN"
-        link_lower = link.lower()
-        if any(x in link_lower for x in ["tr", "turkey", "🇹🇷"]):
-            country = "TR"
-        elif any(x in link_lower for x in ["us", "🇺🇸"]):
-            country = "US"
-        elif any(x in link_lower for x in ["de", "🇩🇪"]):
-            country = "DE"
-        elif any(x in link_lower for x in ["fr", "🇫🇷"]):
-            country = "FR"
-        elif any(x in link_lower for x in ["nl", "🇳🇱"]):
-            country = "NL"
-        elif any(x in link_lower for x in ["sg", "🇸🇬"]):
-            country = "SG"
-        elif any(x in link_lower for x in ["uk", "gb", "🇬🇧"]):
-            country = "GB"
-
-        return {"link": link, "protocol": protocol, "ip": ip, "port": port, "country": country}
+        return {"link": link, "protocol": protocol, "ip": ip, "port": port}
     except Exception:
         return None
 
@@ -126,8 +109,42 @@ async def check_real_internet(node):
     return False
 
 
+async def resolve_real_countries(nodes):
+    if not nodes:
+        return []
+
+    ips = list(set([n['ip'] for n in nodes]))
+    ip_to_country = {}
+    chunks = [ips[i:i + 100] for i in range(0, len(ips), 100)]
+
+    async with aiohttp.ClientSession() as session:
+        for chunk in chunks:
+            try:
+                async with session.post(
+                    "http://ip-api.com/batch?fields=query,countryCode,status", 
+                    json=chunk, 
+                    timeout=10
+                ) as response:
+                    if response.status == 200:
+                        data = await response.json()
+                        for item in data:
+                            if item.get('status') == 'success':
+                                ip_to_country[item['query']] = item.get('countryCode')
+            except Exception:
+                pass
+
+    resolved_nodes = []
+    for n in nodes:
+        cc = ip_to_country.get(n['ip'])
+        if cc:
+            n['country'] = cc
+            resolved_nodes.append(n)
+
+    return resolved_nodes
+
+
 async def main():
-    print("Starting Luma Shield Premium Scraper...")
+    print("Starting Luma Shield Premium Scraper with GeoIP Verification...")
     raw_links = []
 
     async with aiohttp.ClientSession() as session:
@@ -166,8 +183,11 @@ async def main():
         if await check_real_internet(node):
             vip_nodes.append(node)
 
+    print(f"Resolving real physical locations for {len(vip_nodes)} VIP nodes...")
+    verified_nodes = await resolve_real_countries(vip_nodes)
+
     country_pools = {}
-    for node in vip_nodes:
+    for node in verified_nodes:
         c = node['country']
         if c not in country_pools:
             country_pools[c] = []
@@ -193,7 +213,7 @@ async def main():
     with open('luma_premium_nodes.json', 'w', encoding='utf-8') as f:
         json.dump(json_output, f, ensure_ascii=False, indent=2)
 
-    print(f"Process complete! {total_saved} valid nodes exported to luma_premium_nodes.json.")
+    print(f"Process complete! {total_saved} location-verified nodes exported.")
 
 
 if __name__ == "__main__":
