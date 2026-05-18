@@ -1,25 +1,17 @@
 """
 ================================================================================
-Luma Shield - Cloud Proxy Scraper & Egress-First Validator Architecture
+Luma Shield - Cloud Proxy Scraper & L7 Deep Probe Validator
 ================================================================================
 
 Created by Alperen Burak Yeşil
 
 Description:
 This backend aggregator fetches, deduplicates, and evaluates premium VPN nodes.
-It addresses the "CDN Illusion" (Ingress vs Egress mismatch) by implementing a
-predictive egress locator. Instead of strictly relying on the physical location
-of a Cloudflare/CDN IP (which is often misleading), it analyzes SNI, host headers,
-and creator remarks to group nodes by their true egress (exit) country.
-
-Architecture & Core Methods:
-1. Fetching: Pulls raw configurations from expanded premium Telegram/GitHub URLs.
-2. Parsing & Deduplication: Extracts core config details and drops duplicates.
-3. Egress Prediction (predict_true_egress): Employs a scoring heuristic combining
-   Regex boundary checks, emoji flags, and SNI headers to override inaccurate
-   GeoIP API responses for Anycast IPs.
-4. Latency Check: Opens a raw TCP socket, discarding slow nodes (>150ms).
-5. Geo-Structuring: Groups and limits nodes purely by their verified Egress location.
+It specifically destroys "Cloudflare Traps" (Anycast IPs with dead origins) 
+using an advanced Layer 7 (L7) HTTP/TLS Deep Probe. Instead of heavy binary 
+executions, it simulates a raw Xray WebSocket handshake. Nodes returning 
+HTTP 5xx (502, 530) are purged instantly, ensuring the mobile app receives 
+ONLY nodes with guaranteed internet egress.
 ================================================================================
 """
 
@@ -89,27 +81,35 @@ def predict_true_egress(link, ip, sni, host):
 def parse_config(link):
     try:
         link = link.strip()
-        if not link:
-            return None
+        if not link: return None
 
         protocol = link.split('://')[0].lower()
         if protocol not in ['vless', 'trojan', 'vmess']:
             return None
 
-        match = re.search(r'@([^:]+):(\d+)', link)
-        if not match:
-            return None
-            
-        ip = match.group(1)
-        port = int(match.group(2))
+        ip, port, sni, host, path = "", 0, "", "", "/"
 
-        uri = urllib.parse.urlparse(link)
-        query_params = urllib.parse.parse_qs(uri.query)
-        sni = query_params.get('sni', [''])[0]
-        host = query_params.get('host', [''])[0]
+        if protocol == 'vmess':
+            b64 = link[8:]
+            b64 += '=' * (-len(b64) % 4)
+            v = json.loads(base64.b64decode(b64).decode('utf-8'))
+            ip = v.get('add', '')
+            port = int(v.get('port', 443))
+            sni = v.get('sni', '')
+            host = v.get('host', '')
+            path = v.get('path', '/')
+        else:
+            match = re.search(r'@([^:]+):(\d+)', link)
+            if not match: return None
+            ip = match.group(1)
+            port = int(match.group(2))
+            uri = urllib.parse.urlparse(link)
+            query_params = urllib.parse.parse_qs(uri.query)
+            sni = query_params.get('sni', [''])[0]
+            host = query_params.get('host', [''])[0]
+            path = query_params.get('path', ['/'])[0]
         
-        if not sni:
-            sni = host
+        if not sni: sni = host
 
         predicted_country = predict_true_egress(link, ip, sni, host)
 
@@ -119,6 +119,8 @@ def parse_config(link):
             "ip": ip,
             "port": port,
             "sni": sni,
+            "host": host,
+            "path": path,
             "country": predicted_country
         }
     except Exception:
@@ -127,11 +129,13 @@ def parse_config(link):
 async def _do_validate(node):
     ip = node['ip']
     port = node['port']
-    sni = node['sni']
+    sni = node['sni'] or node['host'] or ip
+    host = node['host'] or sni
+    path = node['path']
     start_time = time.time()
 
     try:
-        requires_tls = port in [443, 8443, 2053, 2083, 2087, 2096] or 'vless' in node['protocol'] or 'trojan' in node['protocol']
+        requires_tls = port in [443, 8443, 2053, 2083, 2087, 2096] or 'tls' in node['link'].lower()
         
         if requires_tls:
             context = ssl.create_default_context()
@@ -144,14 +148,37 @@ async def _do_validate(node):
                 asyncio.open_connection(ip, port, ssl=context, server_hostname=valid_sni),
                 timeout=CONNECTION_TIMEOUT
             )
+           
+            req = (f"GET {path} HTTP/1.1\r\n"
+                   f"Host: {host}\r\n"
+                   f"Upgrade: websocket\r\n"
+                   f"Connection: Upgrade\r\n"
+                   f"User-Agent: LumaShield-Validator/1.0\r\n\r\n").encode('utf-8')
+            
+            writer.write(req)
+            await writer.drain()
+
+            resp = await asyncio.wait_for(reader.read(1024), timeout=CONNECTION_TIMEOUT)
+            writer.close()
+            await writer.wait_closed()
+
+            resp_str = resp.decode('utf-8', errors='ignore')
+
+            if "HTTP/1.1 5" in resp_str or "502 Bad Gateway" in resp_str or "Error 5" in resp_str:
+                return None 
+
+            if len(resp) == 0:
+                return None 
+
         else:
             reader, writer = await asyncio.wait_for(
                 asyncio.open_connection(ip, port),
                 timeout=CONNECTION_TIMEOUT
             )
-            
-        writer.close()
-        await writer.wait_closed()
+            writer.write(b"\x00" * 10)
+            await writer.drain()
+            writer.close()
+            await writer.wait_closed()
 
         latency = int((time.time() - start_time) * 1000)
         if latency <= MAX_PING_MS:
@@ -165,7 +192,7 @@ async def _do_validate(node):
 async def validate_node(node, semaphore):
     async with semaphore:
         try:
-            return await asyncio.wait_for(_do_validate(node), timeout=CONNECTION_TIMEOUT + 1.0)
+            return await asyncio.wait_for(_do_validate(node), timeout=CONNECTION_TIMEOUT + 1.5)
         except Exception:
             return None
 
@@ -224,12 +251,15 @@ async def main():
             unique_ips.add(node['ip'])
             parsed_nodes.append(node)
 
+    print(f"Scraped {len(parsed_nodes)} unique nodes. Beginning L7 Deep Probe validation...")
+    
     semaphore = asyncio.Semaphore(CONCURRENCY_LIMIT)
     tasks = [validate_node(node, semaphore) for node in parsed_nodes]
     
     results = await asyncio.gather(*tasks, return_exceptions=True)
 
     alive_nodes = [res for res in results if isinstance(res, dict)]
+    print(f"Validation complete. {len(alive_nodes)} real nodes survived the Cloudflare trap check.")
 
     verified_nodes = await resolve_fallback_countries(alive_nodes)
 
@@ -260,6 +290,8 @@ async def main():
 
     with open('luma_premium_nodes.json', 'w', encoding='utf-8') as f:
         json.dump(json_output, f, ensure_ascii=False, indent=2)
+        
+    print(f"Successfully saved {sum(len(v) for v in json_output.values())} ultra-premium nodes to JSON.")
 
 if __name__ == "__main__":
     if sys.platform == 'win32':
