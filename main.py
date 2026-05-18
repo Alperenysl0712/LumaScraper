@@ -133,6 +133,7 @@ async def _do_validate(node):
     host = node['host'] or sni
     path = node['path']
     start_time = time.time()
+    writer = None 
 
     try:
         requires_tls = port in [443, 8443, 2053, 2083, 2087, 2096] or 'tls' in node['link'].lower()
@@ -148,7 +149,7 @@ async def _do_validate(node):
                 asyncio.open_connection(ip, port, ssl=context, server_hostname=valid_sni),
                 timeout=CONNECTION_TIMEOUT
             )
-           
+
             req = (f"GET {path} HTTP/1.1\r\n"
                    f"Host: {host}\r\n"
                    f"Upgrade: websocket\r\n"
@@ -159,11 +160,10 @@ async def _do_validate(node):
             await writer.drain()
 
             resp = await asyncio.wait_for(reader.read(1024), timeout=CONNECTION_TIMEOUT)
-            writer.close()
-            await writer.wait_closed()
 
             resp_str = resp.decode('utf-8', errors='ignore')
 
+            # Sahte Cloudflare yakalama
             if "HTTP/1.1 5" in resp_str or "502 Bad Gateway" in resp_str or "Error 5" in resp_str:
                 return None 
 
@@ -177,8 +177,6 @@ async def _do_validate(node):
             )
             writer.write(b"\x00" * 10)
             await writer.drain()
-            writer.close()
-            await writer.wait_closed()
 
         latency = int((time.time() - start_time) * 1000)
         if latency <= MAX_PING_MS:
@@ -188,6 +186,13 @@ async def _do_validate(node):
         return None
     except Exception:
         return None
+    finally:
+        if writer is not None:
+            try:
+                writer.close()
+                await writer.wait_closed()
+            except Exception:
+                pass
 
 async def validate_node(node, semaphore):
     async with semaphore:
@@ -292,6 +297,8 @@ async def main():
         json.dump(json_output, f, ensure_ascii=False, indent=2)
         
     print(f"Successfully saved {sum(len(v) for v in json_output.values())} ultra-premium nodes to JSON.")
+    
+    await asyncio.sleep(0.250)
 
 if __name__ == "__main__":
     if sys.platform == 'win32':
