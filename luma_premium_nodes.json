@@ -1,16 +1,16 @@
 {
   "CA": [
     {
-      "config": "vless://4b581293-af3a-4658-b9b2-06949626bf86@104.18.4.130:443?encryption=none&security=tls&sni=cdnde.sheriffbus.com&fp=chrome&type=xhttp&host=cdnde.sheriffbus.com&path=/@SheriffNet&mode=auto#@SheriffNet",
+      "config": "vless://bcce095a-9f98-4e23-a68c-8bbecb785dcd@104.19.140.106:443?path=/213.35.100.31=47112&security=tls&encryption=none&insecure=1&host=afrcloud1.c01.kr&type=ws&allowInsecure=1&sni=afrcloud1.c01.kr#@CUSTOMVPNSERVER",
       "countryCode": "CA",
       "countryName": "CA",
-      "pingMs": 50
+      "pingMs": 48
     },
     {
       "config": "vless://ae0dd58e-e222-40bf-84ae-365a97532737@104.26.1.83:443?encryption=none&host=pagescm.freen10.cc.cd&path=/shop/programs/picturefp=chrome&security=tls&sni=pagescm.freen10.cc.cd&type=ws#🍥61@oneclickvpnkeys",
       "countryCode": "CA",
       "countryName": "CA",
-      "pingMs": 67
+      "pingMs": 53
     },
     {
       "config": "vless://bcce095a-9f98-4e23-a68c-8bbecb785dcd@104.19.141.3:443?path=/213.35.100.31=47112&security=tls&encryption=none&insecure=1&host=afrcloud1.c01.kr&type=ws&allowInsecure=1&sni=afrcloud1.c01.kr#@CUSTOMVPNSERVER",
@@ -19,36 +19,36 @@
       "pingMs": 71
     },
     {
-      "config": "vless://bcce095a-9f98-4e23-a68c-8bbecb785dcd@104.19.140.106:443?path=/213.35.100.31=47112&security=tls&encryption=none&insecure=1&host=afrcloud1.c01.kr&type=ws&allowInsecure=1&sni=afrcloud1.c01.kr#@CUSTOMVPNSERVER",
+      "config": "ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTpBUmd2R1p5d0ErZ2FjZ0dWMjZCdm11MDUrd1ptUlcvaitBZFUrWjhCdDQ0PQ==@23.95.76.59:990#%F0%9F%87%A8%F0%9F%87%A6CA-23.95.76.59-0172",
       "countryCode": "CA",
       "countryName": "CA",
-      "pingMs": 92
+      "pingMs": 91
     }
   ],
   "US": [
     {
+      "config": "vless://c8d1c6d3-388f-48fc-a8f0-ed90d955d096@80.209.241.47:443?encryption=none&flow=xtls-rprx-vision&fp=&pbk=nPcUKydxoRI66O3tT9O4QCZpLjOBvkGsiXG7pDX1BBw&security=reality&sid=6ba85179e30d4fc2&sni=www.google.com&type=tcp#🥊86@oneclickvpnkeys",
+      "countryCode": "US",
+      "countryName": "US",
+      "pingMs": 66
+    },
+    {
+      "config": "vless://c9fd0fb1-8251-4106-b09a-f4b426736f67@137.184.218.169:36925?security=reality&encryption=none&pbk=lJ9INPpO4rdnm2Tek_yg0PGFyUrBB6MoKyvqt_Mfqm0&headerType=none&fp=chrome&type=tcp&flow=xtls-rprx-vision&sni=www.cloudflare.com#@CUSTOMVPNSERVER",
+      "countryCode": "US",
+      "countryName": "US",
+      "pingMs": 75
+    },
+    {
       "config": "vless://bac628dc-cd64-460c-8657-8128c9d6d7b7@188.114.99.160:443?mode=auto&path=/v1/api/sync/f47ac10b58cc4372a5670e02b2c3d479&security=tls&alpn=h2&encryption=none&insecure=0&fp=chrome&type=xhttp&allowInsecure=0&sni=api-ch.nping.ir#Telegram : @V2ynpv",
       "countryCode": "US",
       "countryName": "US",
-      "pingMs": 91
+      "pingMs": 92
     },
     {
       "config": "vless://15235ce9-4cd2-4483-b6b6-7fc4a3f44735@162.159.252.202:443?&security=tls&fp=random&sni=snip.ere.de5.net&type=ws&headerType=none&host=snip.ere.de5.net&path=%2F%3Fed%3D2560#%F0%9F%87%BA%F0%9F%87%B8_US_%E7%BE%8E%E5%9B%BD",
       "countryCode": "US",
       "countryName": "US",
-      "pingMs": 121
-    },
-    {
-      "config": "vless://15235ce9-4cd2-4483-b6b6-7fc4a3f44735@162.159.153.13:443?&security=tls&fp=random&sni=snip.ere.de5.net&type=ws&headerType=none&host=snip.ere.de5.net&path=%2F%3Fed%3D2560#%F0%9F%87%BA%F0%9F%87%B8_US_%E7%BE%8E%E5%9B%BD",
-      "countryCode": "US",
-      "countryName": "US",
-      "pingMs": 142
-    },
-    {
-      "config": "vless://15235ce9-4cd2-4483-b6b6-7fc4a3f44735@104.19.44.107:443?&security=tls&fp=random&sni=snip.ere.de5.net&type=ws&headerType=none&host=snip.ere.de5.net&path=%2F%3Fed%3D2560#%F0%9F%87%BA%F0%9F%87%B8_US_%E7%BE%8E%E5%9B%BD",
-      "countryCode": "US",
-      "countryName": "US",
-      "pingMs": 163
+      "pingMs": 138
     }
   ],
   "NL": [
@@ -56,51 +56,51 @@
       "config": "ss://YWVzLTI1Ni1jZmI6ZjhmN2FDemNQS2JzRjhwMw==@51.15.23.63:989#%F0%9F%87%B3%F0%9F%87%B1NL-51.15.23.63-0188",
       "countryCode": "NL",
       "countryName": "NL",
-      "pingMs": 193
+      "pingMs": 137
     },
     {
-      "config": "ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTpXQzBHYmlDazY3SzhuSERhREhtWUlY@159.223.236.36:19582#%F0%9F%87%B3%F0%9F%87%B1NL-159.223.236.36-0200",
+      "config": "ss://YWVzLTI1Ni1jZmI6ZjhmN2FDemNQS2JzRjhwMw==@79.127.227.53:989#%F0%9F%87%B3%F0%9F%87%B1NL-79.127.227.53-0196",
       "countryCode": "NL",
       "countryName": "NL",
-      "pingMs": 338
+      "pingMs": 210
     },
     {
-      "config": "ss://YWVzLTI1Ni1jZmI6ZjhmN2FDemNQS2JzRjhwMw==@51.15.23.166:989#%F0%9F%87%B3%F0%9F%87%B1NL-51.15.23.166-0123",
+      "config": "vless://48ff2b70-e180-582f-8866-d9a2edeed5f5@51.158.206.93:23576?security=reality&encryption=none&pbk=1y5h2FGWKXTJ9xLPCqPo6Mw7RxoZzh6fGkEQKNxpZ3s&headerType=none&fp=chrome&type=tcp&flow=xtls-rprx-vision&sni=fuck.rkn&sid=01#@CUSTOMVPNSERVER",
       "countryCode": "NL",
       "countryName": "NL",
-      "pingMs": 342
+      "pingMs": 254
     },
     {
-      "config": "vless://ce069292-c8bf-40dd-a6b1-87818a1e64e9@31.130.129.33:443?encryption=none&host=3-2ll.pages.dev&path=/&security=tls&sni=3-2ll.pages.dev&type=ws#🥊44@oneclickvpnkeys",
+      "config": "ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTpWcEtBQmNPcE5OQTBsNUcyQVZPbXc4@213.109.147.242:62685#%F0%9F%87%B3%F0%9F%87%B1NL-213.109.147.242-0191",
       "countryCode": "NL",
       "countryName": "NL",
-      "pingMs": 379
+      "pingMs": 261
     }
   ],
   "GB": [
     {
+      "config": "ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTppZE12b2V3clN5TEx2RXZQMDNrOXpS@138.68.153.223:46576#%F0%9F%87%AC%F0%9F%87%A7GB-138.68.153.223-0151",
+      "countryCode": "GB",
+      "countryName": "GB",
+      "pingMs": 271
+    },
+    {
       "config": "vless://57ba2ab1-a283-42eb-82ee-dc3561a805b8@172.67.153.156:8443?path=/57ba2ab1&security=tls&encryption=none&insecure=1&host=ovhwuxian.pai50288.uk&type=ws&allowInsecure=1&sni=ovhwuxian.pai50288.uk#@v2rayngzendegimamad🕊️",
       "countryCode": "GB",
       "countryName": "GB",
-      "pingMs": 210
+      "pingMs": 293
+    },
+    {
+      "config": "ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTprMWRCT21PQjRvcWk3VW1wMzdhMWJR@82.38.31.199:8080#%F0%9F%87%AC%F0%9F%87%A7GB-82.38.31.199-0117",
+      "countryCode": "GB",
+      "countryName": "GB",
+      "pingMs": 305
     },
     {
       "config": "vless://6202b230-417c-4d8e-b624-0f71afa9c75d@141.101.121.169:2096?allowInsecure=1&alpn=AKBARCONFIG@.AKBARCONFIG@.AKBARCONFIG@.AKBARCONFIG@.AKBARCONFIG@.AKBARCONFIG@.networld_vpn-&encryption=none&host=sni.111000.indevs.in&security=tls&sni=sni.111000.indevs.in&type=ws#🍥3@oneclickvpnkeys",
       "countryCode": "GB",
       "countryName": "GB",
-      "pingMs": 232
-    },
-    {
-      "config": "ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTppZE12b2V3clN5TEx2RXZQMDNrOXpS@138.68.153.223:46576#%F0%9F%87%AC%F0%9F%87%A7GB-138.68.153.223-0151",
-      "countryCode": "GB",
-      "countryName": "GB",
-      "pingMs": 337
-    },
-    {
-      "config": "vless://6202b230-417c-4d8e-b624-0f71afa9c75d@185.156.19.138:2096?ed=2560&eh=Sec-WebSocket-Protocol&encryption=none&fp=chrome&host=sni.111000.indevs.in&path=/?Telegram🇨🇳@WangCai2=&security=tls&sni=sni.111000.indevs.in&type=ws#🐸20@oneclickvpnkeys",
-      "countryCode": "GB",
-      "countryName": "GB",
-      "pingMs": 387
+      "pingMs": 309
     }
   ],
   "DE": [
@@ -108,77 +108,97 @@
       "config": "vless://c0b8963b-b2ba-4b74-8602-98a8b044f3bc@188.114.97.3:8443?path=/eyJqdW5rIjoid3VFQlVxUnltIiwicHJvdG9jb2wiOiJ2bCIsIm1vZGUiOiJwcm94eWlwIiwicGFuZWxJUHMiOltdfQ==?ed=2560&security=tls&alpn=http/1.1&encryption=none&host=v2ngfast-v2ngfat-v2ngfast-v2ngfat-v2ngfast-v2ngfat.tocos74667.workers.dev&fp=chrome&type=ws&sni=v2NGfAsT-v2NGFAT-V2NgFAst-V2nGFAt-v2ngfAst-V2nGfAt.tocoS74667.WorkerS.DeV#1 🇩🇪 @V2ngFast",
       "countryCode": "DE",
       "countryName": "DE",
-      "pingMs": 50
+      "pingMs": 68
     },
     {
       "config": "vless://a31c6e82-61c8-4f58-bef2-1d9b2e0a77d3@104.21.70.121:2083?path=/eyJqdW5rIjoicjMyeGJ1NHBVVmJLTyIsInByb3RvY29sIjoidmwiLCJtb2RlIjoicHJveHlpcCIsInBhbmVsSVBzIjpbXX0=?ed=2560&security=tls&alpn=http/1.1&encryption=none&host=v2ngfast-v2ngfast-v2ngfast-v2ngfast-v2ngfast-v2ngfast.sixol99944.workers.dev&fp=chrome&type=ws&sni=V2NgfasT-v2ngfaST-v2nGFAST-V2NGfAsT-V2ngFAST-v2nGfAST.siXol99944.wORkErS.dEv#2 🇩🇪 @V2ngFast",
       "countryCode": "DE",
       "countryName": "DE",
-      "pingMs": 53
+      "pingMs": 74
     },
     {
-      "config": "vless://5874ce17-1e4a-4cf5-b67e-c88da6194616@172.67.181.144:443?path=/eyJqdW5rIjoicHFDN0R3VG1PTmZVIiwicHJvdG9jb2wiOiJ2bCIsIm1vZGUiOiJwcm94eWlwIiwicGFuZWxJUHMiOltdfQ==?ed=2560&security=tls&alpn=http/1.1&encryption=none&host=royal-limit-4b1c.rosomo9596.workers.dev&fp=chrome&type=ws&sni=rOYAl-LiMIt-4B1C.ROSomO9596.workerS.deV#4  🇩🇪 @V2ngFast",
+      "config": "vless://d52936ab-2091-4f3a-87c2-6b02a9eb20d5@152.89.244.172:2054?mode=auto&path=/api/v1/feed&security=reality&encryption=none&pbk=SWs-hbcCleuO_BzRPnWBxVOiQWPpMEgAQi_kH_zgyAo&host=api.vk.ru&fp=chrome&type=xhttp&sni=api.vk.ru&sid=29f847c151f96091#🇫🇮 Финляндия | VPN • XHTTP | тгк: Vlesstrogan",
       "countryCode": "DE",
       "countryName": "DE",
-      "pingMs": 186
+      "pingMs": 267
     },
     {
       "config": "ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTpQV3BqUG8zdHFoUE40eVJa@8.209.74.72:20001#%F0%9F%87%A9%F0%9F%87%AADE-8.209.74.72-0160",
       "countryCode": "DE",
       "countryName": "DE",
-      "pingMs": 230
+      "pingMs": 387
     }
   ],
   "SG": [
     {
-      "config": "ss://Y2hhY2hhMjAtaWV0Zjphc2QxMjM0NTY=@103.36.91.23:8388#%F0%9F%87%B8%F0%9F%87%ACSG-103.36.91.23-0252",
-      "countryCode": "SG",
-      "countryName": "SG",
-      "pingMs": 357
-    },
-    {
       "config": "ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTpBUmd2R1p5d0ErZ2FjZ0dWMjZCdm11MDUrd1ptUlcvaitBZFUrWjhCdDQ0PQ==@38.89.142.56:990#%F0%9F%87%B8%F0%9F%87%ACSG-38.89.142.56-0173",
       "countryCode": "SG",
       "countryName": "SG",
-      "pingMs": 425
+      "pingMs": 345
+    },
+    {
+      "config": "ss://Y2hhY2hhMjAtaWV0Zjphc2QxMjM0NTY=@103.36.91.23:8388#%F0%9F%87%B8%F0%9F%87%ACSG-103.36.91.23-0252",
+      "countryCode": "SG",
+      "countryName": "SG",
+      "pingMs": 346
     },
     {
       "config": "vless://6202b230-417c-4d8e-b624-0f71afa9c75d@45.8.211.191:2096?allowInsecure=1&encryption=none&fp=chrome&host=sni.my111000.tech&path=/&security=tls&sni=sni.my111000.tech&type=ws#🍥20@oneclickvpnkeys",
       "countryCode": "SG",
       "countryName": "SG",
-      "pingMs": 522
+      "pingMs": 541
     },
     {
       "config": "ss://Y2hhY2hhMjAtaWV0Zjphc2QxMjM0NTY=@103.36.91.32:8388#%F0%9F%87%B8%F0%9F%87%ACSG-103.36.91.32-0174",
       "countryCode": "SG",
       "countryName": "SG",
-      "pingMs": 664
+      "pingMs": 927
+    }
+  ],
+  "AU": [
+    {
+      "config": "ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTpBUmd2R1p5d0ErZ2FjZ0dWMjZCdm11MDUrd1ptUlcvaitBZFUrWjhCdDQ0PQ==@45.15.185.70:990#%F0%9F%87%A8%F0%9F%87%BECY-45.15.185.70-0166",
+      "countryCode": "AU",
+      "countryName": "AU",
+      "pingMs": 345
+    },
+    {
+      "config": "vless://aca32055-db88-4634-b623-6429ddbb6c93@54.252.231.115:55292?allowInsecure=0&sni=yahoo.com&flow=xtls-rprx-vision-udp443&fp=firefox&security=tls#AU_speednode_0001",
+      "countryCode": "AU",
+      "countryName": "AU",
+      "pingMs": 1374
+    },
+    {
+      "config": "vless://b64ced11-143e-4ded-a985-a8de25461061@3.27.234.120:51808?allowInsecure=0&sni=yahoo.com&flow=xtls-rprx-vision-udp443&fp=firefox&security=tls#AU_speednode_0002",
+      "countryCode": "AU",
+      "countryName": "AU",
+      "pingMs": 1385
     }
   ],
   "ES": [
     {
+      "config": "ss://YWVzLTI1Ni1jZmI6TTN0MlpFUWNNR1JXQmpSYQ==@5.188.181.201:9011#%F0%9F%87%AA%F0%9F%87%B8ES-5.188.181.201-0260",
+      "countryCode": "ES",
+      "countryName": "ES",
+      "pingMs": 275
+    },
+    {
       "config": "vless://d428091c-e6eb-48f9-9a07-b44eb886ac90@2.27.26.36:443?security=reality&sni=www.google.com&fp=chrome&pbk=RrBMccWJkTEHyG-V4ETU4SLEPYgxMzMyKdNQ1vu_RQc&sid=655345236526&type=tcp&flow=xtls-rprx-vision&packetEncoding=xudp&encryption=none#@v2rayconfigamir 7200",
       "countryCode": "ES",
       "countryName": "ES",
-      "pingMs": 465
-    },
-    {
-      "config": "ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTpBUmd2R1p5d0ErZ2FjZ0dWMjZCdm11MDUrd1ptUlcvaitBZFUrWjhCdDQ0PQ==@37.143.130.203:990#%F0%9F%87%AA%F0%9F%87%B8ES-37.143.130.203-0224",
-      "countryCode": "ES",
-      "countryName": "ES",
-      "pingMs": 665
-    },
-    {
-      "config": "trojan://humanity@185.18.250.245:443?security=tls&sni=www.calmlunch.com&fp=random&insecure=1&allowInsecure=1&type=ws&host=www.calmlunch.com&path=%2Fassignment#%40V2raysCollector%20%F0%9F%A4%94",
-      "countryCode": "ES",
-      "countryName": "ES",
-      "pingMs": 822
+      "pingMs": 320
     },
     {
       "config": "ss://YWVzLTI1Ni1jZmI6ZjhmN2FDemNQS2JzRjhwMw==@45.154.206.192:989#%F0%9F%87%AA%F0%9F%87%B8ES-45.154.206.192-0178",
       "countryCode": "ES",
       "countryName": "ES",
-      "pingMs": 854
+      "pingMs": 345
+    },
+    {
+      "config": "trojan://humanity@185.18.250.245:443?security=tls&sni=www.calmlunch.com&fp=random&insecure=1&allowInsecure=1&type=ws&host=www.calmlunch.com&path=%2Fassignment#%40V2raysCollector%20%F0%9F%A4%94",
+      "countryCode": "ES",
+      "countryName": "ES",
+      "pingMs": 820
     }
   ],
   "IT": [
@@ -186,7 +206,7 @@
       "config": "ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTpBUmd2R1p5d0ErZ2FjZ0dWMjZCdm11MDUrd1ptUlcvaitBZFUrWjhCdDQ0PQ==@176.126.83.158:990#%F0%9F%87%AE%F0%9F%87%B9IT-176.126.83.158-0203",
       "countryCode": "IT",
       "countryName": "IT",
-      "pingMs": 674
+      "pingMs": 927
     }
   ],
   "FR": [
@@ -194,51 +214,25 @@
       "config": "vless://6202b230-417c-4d8e-b624-0f71afa9c75d@185.16.110.238:2096?path=/?ed=2560&Telegram@V2rayAlpha&security=tls&encryption=none&insecure=0&host=sni.jpmj.dev&type=ws&allowInsecure=0&sni=sni.jpmj.dev#IR-@V2rayAlpha-5",
       "countryCode": "FR",
       "countryName": "FR",
-      "pingMs": 338
+      "pingMs": 406
     },
     {
       "config": "vless://c9f0224c-c509-427e-b314-cef6cab20646@52.47.86.31:12453?encryption=none&flow=xtls-rprx-vision&fp=&pbk=7Bp5RgrAqaiXOsiKaWnu6uliLDG8Eey2gA0coU9oay0&security=reality&sid=52f510cea0a0a5ef&sni=yahoo.com&type=tcp#🍥73@oneclickvpnkeys",
       "countryCode": "FR",
       "countryName": "FR",
-      "pingMs": 569
-    },
-    {
-      "config": "vless://acd726d3-0128-44d8-a575-21013ff7740a@51.44.25.250:44520?encryption=none&flow=xtls-rprx-vision&fp=&pbk=MrLRcU_2S2CpUc7VT3ajIavX5NYUiQdP6J5QTDFNGFU&security=reality&sid=8897c56a495b26cc&sni=yahoo.com&type=tcp#🥊67@oneclickvpnkeys",
-      "countryCode": "FR",
-      "countryName": "FR",
-      "pingMs": 645
+      "pingMs": 463
     },
     {
       "config": "vless://deb96819-bdaa-4f52-a536-d4751290ce47@13.38.52.64:15469?encryption=none&flow=xtls-rprx-vision&fp=&pbk=Mr1b8zNNR1uPtf8dgfze_kBJbaVimS0NhJL0ff_2qm4&security=reality&sid=0f8d9583dd332274&sni=yahoo.com&type=tcp#🥊58@oneclickvpnkeys",
       "countryCode": "FR",
       "countryName": "FR",
-      "pingMs": 695
-    }
-  ],
-  "JP": [
-    {
-      "config": "vless://6202b230-417c-4d8e-b624-0f71afa9c75d@138.2.59.112:443?&security=tls&sni=sni.111000.v6.army&type=ws&headerType=none&host=sni.111000.v6.army&path=/?ed=2560#🇱🇻 t.me/Natrixo BB",
-      "countryCode": "JP",
-      "countryName": "JP",
-      "pingMs": 595
+      "pingMs": 521
     },
     {
-      "config": "trojan://8r%3C%5B9%27l6hAO%238ZQi@64.110.104.30:443?allowInsecure=1&sni=Koma-YT.PAGeS.Dev&type=ws&path=/trTelegram🇨🇳 @WangCai2#%E7%BE%8E%E5%9B%BD+V2CROSS.COM",
-      "countryCode": "JP",
-      "countryName": "JP",
-      "pingMs": 929
-    },
-    {
-      "config": "vless://00000000-0000-4000-8000-000000000000@192.204.110.80:40133?sni=adv2m5gy-wrhiahph85c.ovtc.qzz.io&type=ws&host=adv2m5gy-wrhiahph85c.ovtc.qzz.io&path=/@Marisa_kristifp=chromesecurity=tls#B%20-%20%F0%9F%87%AF%F0%9F%87%B5%20JP%2023%20TG%3A%20%40nodpai",
-      "countryCode": "JP",
-      "countryName": "JP",
-      "pingMs": 1224
-    },
-    {
-      "config": "trojan://8r%3C%5B9%27l6hAO%238ZQi@64.176.38.23:2083?allowInsecure=1&sni=Koma-YT.PAGeS.Dev&type=ws&host=Koma-YT.PAGeS.Dev&path=/trTelegram🇨🇳#%F0%9F%87%AF%F0%9F%87%B5JP_4%7C1.9MB/s",
-      "countryCode": "JP",
-      "countryName": "JP",
-      "pingMs": 1273
+      "config": "vless://acd726d3-0128-44d8-a575-21013ff7740a@51.44.25.250:44520?encryption=none&flow=xtls-rprx-vision&fp=&pbk=MrLRcU_2S2CpUc7VT3ajIavX5NYUiQdP6J5QTDFNGFU&security=reality&sid=8897c56a495b26cc&sni=yahoo.com&type=tcp#🥊67@oneclickvpnkeys",
+      "countryCode": "FR",
+      "countryName": "FR",
+      "pingMs": 559
     }
   ],
   "TR": [
@@ -246,21 +240,39 @@
       "config": "vless://c8d1c6d3-388f-48fc-a8f0-ed90d955d096@194.87.39.215:443?encryption=none&flow=xtls-rprx-vision&fp=&pbk=nPcUKydxoRI66O3tT9O4QCZpLjOBvkGsiXG7pDX1BBw&security=reality&sid=6ba85179e30d4fc2&sni=www.google.com&type=tcp#🥊71@oneclickvpnkeys",
       "countryCode": "TR",
       "countryName": "TR",
-      "pingMs": 440
-    }
-  ],
-  "AU": [
-    {
-      "config": "vless://b64ced11-143e-4ded-a985-a8de25461061@3.27.234.120:51808?allowInsecure=0&sni=yahoo.com&flow=xtls-rprx-vision-udp443&fp=firefox&security=tls#AU_speednode_0002",
-      "countryCode": "AU",
-      "countryName": "AU",
-      "pingMs": 1220
+      "pingMs": 353
     },
     {
-      "config": "vless://aca32055-db88-4634-b623-6429ddbb6c93@54.252.231.115:55292?allowInsecure=0&sni=yahoo.com&flow=xtls-rprx-vision-udp443&fp=firefox&security=tls#AU_speednode_0001",
-      "countryCode": "AU",
-      "countryName": "AU",
-      "pingMs": 1240
+      "config": "vless://43488128-319e-f480-64ea-0acdc712e2a8@2.56.127.207:443?encryption=none&flow=xtls-rprx-vision&fp=&pbk=XkRQUOLTBAiIXB1MK9oJwlfn-9XnH53ykk5UE6rDyFc&security=reality&sid=d4356669ea880400&sni=store.steampowered.com&type=tcp#🥊81@oneclickvpnkeys",
+      "countryCode": "TR",
+      "countryName": "TR",
+      "pingMs": 370
+    }
+  ],
+  "JP": [
+    {
+      "config": "vless://6202b230-417c-4d8e-b624-0f71afa9c75d@138.2.59.112:443?&security=tls&sni=sni.111000.v6.army&type=ws&headerType=none&host=sni.111000.v6.army&path=/?ed=2560#🇱🇻 t.me/Natrixo BB",
+      "countryCode": "JP",
+      "countryName": "JP",
+      "pingMs": 655
+    },
+    {
+      "config": "trojan://8r%3C%5B9%27l6hAO%238ZQi@64.176.38.23:2083?allowInsecure=1&sni=Koma-YT.PAGeS.Dev&type=ws&host=Koma-YT.PAGeS.Dev&path=/trTelegram🇨🇳#%F0%9F%87%AF%F0%9F%87%B5JP_4%7C1.9MB/s",
+      "countryCode": "JP",
+      "countryName": "JP",
+      "pingMs": 1190
+    },
+    {
+      "config": "vless://6202b230-417c-4d8e-b624-0f71afa9c75d@38.47.104.110:443?sni=sni.111000.v6.army&type=ws&host=sni.111000.v6.army&path=/?ed=2560security=tls#A%20-%20%F0%9F%87%AF%F0%9F%87%B5%20JP%2004%20TG%3A%20%40nodpai",
+      "countryCode": "JP",
+      "countryName": "JP",
+      "pingMs": 1262
+    },
+    {
+      "config": "trojan://8r%3C%5B9%27l6hAO%238ZQi@66.135.5.63:443?allowInsecure=1&sni=Koma-YT.PAGeS.Dev&ws=1&wspath=%2FtrTelegram%F0%9F%87%A8%F0%9F%87%B3%2B%40WangCai2#%F0%9F%87%AF%F0%9F%87%B5%20%E7%BE%8E%E5%9B%BD%20%E8%B7%AF%E6%98%93%E6%96%AF%E5%AE%89%E9%82%A3%E5%B7%9E%E5%B7%B4%E5%90%9E%E9%B2%81%E6%97%A5Smartrove%E5%85%AC%E5%8F%B8",
+      "countryCode": "JP",
+      "countryName": "JP",
+      "pingMs": 1318
     }
   ]
 }
