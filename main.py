@@ -57,9 +57,9 @@ SOURCES = [
 ]
 
 MAX_PING_MS = 1500
-CONNECTION_TIMEOUT = 3.5
+CONNECTION_TIMEOUT = 3.0
 TOP_NODES_PER_COUNTRY = 4
-CONCURRENCY_LIMIT = 150
+CONCURRENCY_LIMIT = 100
 
 COUNTRY_MAPPINGS = {
     "TR": ["🇹🇷", r"\bTR\b", r"\bTURKEY\b", r"\.tr$"],
@@ -137,42 +137,47 @@ def parse_config(link):
     except Exception:
         return None
 
+async def _do_validate(node):
+    ip = node['ip']
+    port = node['port']
+    sni = node['sni']
+    start_time = time.time()
+
+    try:
+        requires_tls = port in [443, 8443, 2053, 2083, 2087, 2096] or 'vless' in node['protocol'] or 'trojan' in node['protocol']
+        
+        if requires_tls:
+            context = ssl.create_default_context()
+            context.check_hostname = False
+            context.verify_mode = ssl.CERT_NONE
+            
+            valid_sni = sni if sni and not re.match(r"^\d{1,3}(\.\d{1,3}){3}$", sni) else None
+            
+            reader, writer = await asyncio.wait_for(
+                asyncio.open_connection(ip, port, ssl=context, server_hostname=valid_sni),
+                timeout=CONNECTION_TIMEOUT
+            )
+        else:
+            reader, writer = await asyncio.wait_for(
+                asyncio.open_connection(ip, port),
+                timeout=CONNECTION_TIMEOUT
+            )
+            
+        writer.close()
+
+        latency = int((time.time() - start_time) * 1000)
+        if latency <= MAX_PING_MS:
+            node['ping'] = latency
+            return node
+            
+        return None
+    except Exception:
+        return None
+
 async def validate_node(node, semaphore):
     async with semaphore:
-        ip = node['ip']
-        port = node['port']
-        sni = node['sni']
-        start_time = time.time()
-
         try:
-            requires_tls = port in [443, 8443, 2053, 2083, 2087, 2096] or 'vless' in node['protocol'] or 'trojan' in node['protocol']
-            
-            if requires_tls:
-                context = ssl.create_default_context()
-                context.check_hostname = False
-                context.verify_mode = ssl.CERT_NONE
-                
-                valid_sni = sni if sni and not re.match(r"^\d{1,3}(\.\d{1,3}){3}$", sni) else None
-                
-                reader, writer = await asyncio.wait_for(
-                    asyncio.open_connection(ip, port, ssl=context, server_hostname=valid_sni),
-                    timeout=CONNECTION_TIMEOUT
-                )
-            else:
-                reader, writer = await asyncio.wait_for(
-                    asyncio.open_connection(ip, port),
-                    timeout=CONNECTION_TIMEOUT
-                )
-                
-            writer.close()
-            await writer.wait_closed()
-
-            latency = int((time.time() - start_time) * 1000)
-            if latency <= MAX_PING_MS:
-                node['ping'] = latency
-                return node
-                
-            return None
+            return await asyncio.wait_for(_do_validate(node), timeout=CONNECTION_TIMEOUT + 2.0)
         except Exception:
             return None
 
