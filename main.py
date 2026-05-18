@@ -111,6 +111,15 @@ def parse_config(link):
         
         if not sni: sni = host
 
+        if protocol == 'vless' and port == 443:
+            if 'alpn=http/1.1' not in link:
+                link += '&alpn=http/1.1'
+            
+            link = re.sub(r'sni=[^&]+', 'sni=speedtest.net', link)
+            sni = 'speedtest.net'
+
+        
+
         predicted_country = predict_true_egress(link, ip, sni, host)
 
         return {
