@@ -34,32 +34,20 @@ import urllib.parse
 import ssl
 
 SOURCES = [
-    "https://raw.githubusercontent.com/mahdibland/ShadowsocksAggregator/master/Eternity",
-    "https://raw.githubusercontent.com/ALIILAPRO/v2rayNG-Config/main/sub.txt",
-    "https://raw.githubusercontent.com/barry-far/V2ray-Config/main/Splitted-By-Protocol/trojan.txt",
+    "https://raw.githubusercontent.com/ebrasha/free-v2ray-public-list/main/vless_configs.txt",
+    "https://raw.githubusercontent.com/ebrasha/free-v2ray-public-list/main/trojan_configs.txt",
+    "https://raw.githubusercontent.com/ebrasha/free-v2ray-public-list/main/vmess_configs.txt",
+    "https://raw.githubusercontent.com/ebrasha/free-v2ray-public-list/main/ss_configs.txt",
     "https://raw.githubusercontent.com/barry-far/V2ray-Config/main/Splitted-By-Protocol/vless.txt",
+    "https://raw.githubusercontent.com/barry-far/V2ray-Config/main/Splitted-By-Protocol/trojan.txt",
     "https://raw.githubusercontent.com/yebekhe/TelegramV2rayCollector/main/sub/normal/mix",
-    "https://raw.githubusercontent.com/Epodon/v2ray-configs/main/All_Configs_Sub.txt",
-    "https://raw.githubusercontent.com/soroushmirzaei/telegram-configs-collector/main/protocols/trojan",
-    "https://raw.githubusercontent.com/soroushmirzaei/telegram-configs-collector/main/protocols/vless",
-    "https://raw.githubusercontent.com/mfuu/v2ray/master/v2ray",
-    "https://raw.githubusercontent.com/Leon406/Sub/master/sub/configs.txt",
-    "https://raw.githubusercontent.com/peasoft/NoMoreWalls/master/list.txt",
-    "https://raw.githubusercontent.com/BoringCat/v2ray-links/master/links.txt",
-    "https://raw.githubusercontent.com/freefq/free/master/v2",
-    "https://raw.githubusercontent.com/tbbatbb/Proxy/master/main/trojan",
-    "https://raw.githubusercontent.com/tbbatbb/Proxy/master/main/vless",
-    "https://raw.githubusercontent.com/Pawdroid/Free-servers/main/sub",
-    "https://raw.githubusercontent.com/aiboboxx/v2rayfree/main/v2",
-    "https://raw.githubusercontent.com/ermaozi/get_subscribe/main/subscribe/v2ray.txt",
-    "https://raw.githubusercontent.com/v2ray-links/v2ray-free/master/v2ray",
-    "https://raw.githubusercontent.com/JlikO/V2Ray-configs/main/All_Configs_Sub.txt"
+    "https://raw.githubusercontent.com/Leon406/Sub/master/sub/configs.txt"
 ]
 
 MAX_PING_MS = 1500
 CONNECTION_TIMEOUT = 3.0
-TOP_NODES_PER_COUNTRY = 4
-CONCURRENCY_LIMIT = 100
+TOP_NODES_PER_COUNTRY = 5
+CONCURRENCY_LIMIT = 150
 
 COUNTRY_MAPPINGS = {
     "TR": ["🇹🇷", r"\bTR\b", r"\bTURKEY\b", r"\.tr$"],
@@ -106,7 +94,7 @@ def parse_config(link):
             return None
 
         protocol = link.split('://')[0].lower()
-        if protocol not in ['vless', 'trojan', 'ss']:
+        if protocol not in ['vless', 'trojan', 'ss', 'vmess']:
             return None
 
         match = re.search(r'@([^:]+):(\d+)', link)
@@ -164,6 +152,7 @@ async def _do_validate(node):
             )
             
         writer.close()
+        await writer.wait_closed()
 
         latency = int((time.time() - start_time) * 1000)
         if latency <= MAX_PING_MS:
@@ -177,7 +166,7 @@ async def _do_validate(node):
 async def validate_node(node, semaphore):
     async with semaphore:
         try:
-            return await asyncio.wait_for(_do_validate(node), timeout=CONNECTION_TIMEOUT + 2.0)
+            return await asyncio.wait_for(_do_validate(node), timeout=CONNECTION_TIMEOUT + 1.0)
         except Exception:
             return None
 
