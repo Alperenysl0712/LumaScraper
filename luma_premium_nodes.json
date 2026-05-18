@@ -1,0 +1,294 @@
+{
+  "US": [
+    {
+      "config": "trojan://tg-fq521free@198.62.62.67:443/?type=tcp&security=tls&sni=torjan.xn--xhq44j.eu.org# By EbraSha ⛓️",
+      "countryCode": "US",
+      "countryName": "US",
+      "pingMs": 78
+    },
+    {
+      "config": "trojan://8r%3C%5B9%27l6hAO%238ZQi@184.174.97.38:443?security=tls&sni=Koma-YT.PAGeS.Dev# By EbraSha 🧨",
+      "countryCode": "US",
+      "countryName": "US",
+      "pingMs": 424
+    },
+    {
+      "config": "vless://e032123c-e7ef-4bd5-aeb2-7db40cac27c3@66.228.39.72:443?type=xhttp&amp;path=/&amp;host=&amp;mode=stream-one&amp;security=none# By EbraSha ♣️",
+      "countryCode": "US",
+      "countryName": "US",
+      "pingMs": 453
+    },
+    {
+      "config": "vless://06b65903-406d-4a41-8463-6fd5c0ee7798@154.26.189.70:443?encryption=none&security=tls&sni=sni.skylee4.cloudns.ch&fp=chrome&insecure=0&allowInsecure=0&type=ws&host=sni.skylee4.cloudns.ch&path=%2Fproxyip%3DProxyIP.CMLiussss.net# By EbraSha 🗿",
+      "countryCode": "US",
+      "countryName": "US",
+      "pingMs": 484
+    },
+    {
+      "config": "vless://06b65903-406d-4a41-8463-6fd5c0ee7798@154.21.95.34:443?encryption=none&security=tls&sni=sn1.skylee5.cloudns.ch&type=ws&host=sn1.skylee5.cloudns.ch&path=%2Fproxyip%3Dproxyip.cmliussss.net# By EbraSha 🦾",
+      "countryCode": "US",
+      "countryName": "US",
+      "pingMs": 500
+    }
+  ],
+  "CA": [
+    {
+      "config": "trojan://tg-dns68@162.159.152.42:443?security=tls&type=ws&sni=vip.putata.eu.org&host=vip.putata.eu.org# By EbraSha 🦾",
+      "countryCode": "CA",
+      "countryName": "CA",
+      "pingMs": 78
+    },
+    {
+      "config": "trojan://tg-dns68@162.159.153.8:443/?type=tcp&security=tls&sni=vip.putata.eu.org# By EbraSha 🐺",
+      "countryCode": "CA",
+      "countryName": "CA",
+      "pingMs": 80
+    },
+    {
+      "config": "trojan://trojan@172.64.155.16:2053/?type=ws&host=ana-service-anaservice--anaservice-antenircomorg.fmwlmluu.workers.dev&security=tls&sni=ana-service-anaservice--anaservice-antenircomorg.fmwlmluu.workers.dev# By EbraSha 🚨",
+      "countryCode": "CA",
+      "countryName": "CA",
+      "pingMs": 126
+    },
+    {
+      "config": "trojan://ttfang@172.64.156.106:443/?type=tcp&security=tls&sni=ttfang.fange.me# By EbraSha ♦️",
+      "countryCode": "CA",
+      "countryName": "CA",
+      "pingMs": 271
+    },
+    {
+      "config": "vless://df4e1392-c78a-4a67-86b2-8c8eefce64b8@172.67.190.122:8443?security=tls&sni=imaneemon66.imanf8roouznia.workers.dev&type=ws&host=imaneemon66.imanf8roouznia.workers.dev&path=%2Fvless-ws%2F%3Fed%3D2048&fp=chrome# By EbraSha 🥷",
+      "countryCode": "CA",
+      "countryName": "CA",
+      "pingMs": 377
+    }
+  ],
+  "DE": [
+    {
+      "config": "vless://05519058-d2ac-4f28-9e4a-2b2a1386749e@3.77.116.109:22224?type=ws&amp;security=tls&amp;path=/telegram-channel-vlessconfig&amp;sni=trojan.burgerip.co.uk# By EbraSha 🧨",
+      "countryCode": "DE",
+      "countryName": "DE",
+      "pingMs": 565
+    },
+    {
+      "config": "trojan://8r%3C%5B9%27l6hAO%238ZQi@178.104.93.49:8443?host=Koma-YT.PAGeS.Dev&path=/trTelegram%F0%9F%87%A8%F0%9F%87%B3+%40WangCai2&security=tls&sni=Koma-YT.PAGeS.Dev&type=ws# By EbraSha 🛜",
+      "countryCode": "DE",
+      "countryName": "DE",
+      "pingMs": 638
+    },
+    {
+      "config": "trojan://8r%3C%5B9%27l6hAO%238ZQi@178.236.253.242:8443?host=Koma-YT.PAGeS.Dev&path=/trTelegram%F0%9F%87%A8%F0%9F%87%B3+%40WangCai2&security=tls&sni=Koma-YT.PAGeS.Dev&type=ws# By EbraSha 🌍",
+      "countryCode": "DE",
+      "countryName": "DE",
+      "pingMs": 692
+    },
+    {
+      "config": "vless://1a25f8ad-cad2-4e93-b5bf-34e42bcac02a@185.158.133.158:2096/?type=ws&encryption=none&flow=&host=sni.111000.de5.net&path=%2F%3Fed%3D2560&security=tls&sni=sni.111000.de5.net# By EbraSha 💎",
+      "countryCode": "DE",
+      "countryName": "DE",
+      "pingMs": 758
+    },
+    {
+      "config": "trojan://8r%3C%5B9%27l6hAO%238ZQi@178.128.198.120:2053?host=Koma-YT.PAGeS.Dev&path=/trTelegram%F0%9F%87%A8%F0%9F%87%B3+%40WangCai2&security=tls&sni=Koma-YT.PAGeS.Dev&type=ws# By EbraSha 🚨",
+      "countryCode": "DE",
+      "countryName": "DE",
+      "pingMs": 780
+    }
+  ],
+  "FR": [
+    {
+      "config": "vless://060a8fe8-7175-4ded-94a5-d9808bc645b6@104.18.35.85:443?path=%2F&security=tls&encryption=none&host=cf.vless.sandesh.fr&fp=chrome&type=ws&sni=cf.vless.sandesh.fr# By EbraSha 🔮",
+      "countryCode": "FR",
+      "countryName": "FR",
+      "pingMs": 204
+    },
+    {
+      "config": "trojan://8r%3C%5B9%27l6hAO%238ZQi@185.157.245.136:2053?host=Koma-YT.PAGeS.Dev&path=/trTelegram%F0%9F%87%A8%F0%9F%87%B3+%40WangCai2&security=tls&sni=Koma-YT.PAGeS.Dev&type=ws# By EbraSha 📟",
+      "countryCode": "FR",
+      "countryName": "FR",
+      "pingMs": 517
+    },
+    {
+      "config": "vless://e5f8a9f6-f164-479b-b3b5-b90f213c7145@141.101.120.7:2053?encryption=none&security=tls&sni=ir1.airpanel.top&fp=chrome&insecure=0&allowInsecure=0&type=ws&host=ir1.airpanel.top&path=%2F# By EbraSha 📶",
+      "countryCode": "FR",
+      "countryName": "FR",
+      "pingMs": 562
+    },
+    {
+      "config": "vless://e5f8a9f6-f164-479b-b3b5-b90f213c7145@141.101.120.54:2053?encryption=none&security=tls&sni=ir1.airpanel.top&fp=chrome&insecure=0&allowInsecure=0&type=ws&host=ir1.airpanel.top&path=%2F# By EbraSha 🔥",
+      "countryCode": "FR",
+      "countryName": "FR",
+      "pingMs": 576
+    },
+    {
+      "config": "vless://e5f8a9f6-f164-479b-b3b5-b90f213c7145@141.101.120.23:2053?encryption=none&security=tls&sni=ir1.airpanel.top&type=ws&host=ir1.airpanel.top&path=%2F# By EbraSha 📀",
+      "countryCode": "FR",
+      "countryName": "FR",
+      "pingMs": 591
+    }
+  ],
+  "JP": [
+    {
+      "config": "vless://0663e78c-d73b-48bf-a99b-fb318486f601@57.180.23.89:53863?type=tcp&encryption=none&security=reality&pbk=QCSdJdwySeyGF6QYIIQfmdN9ErY79rJWuuWhSh6LWn8&fp=firefox&sni=www.icloud.com&sid=d31522d103e50a28&spx=/&flow=xtls-rprx-vision# By EbraSha 📶",
+      "countryCode": "JP",
+      "countryName": "JP",
+      "pingMs": 629
+    },
+    {
+      "config": "vless://11d29ec6-be66-4f59-97c6-7cff836ea318@138.2.50.155:44073?type=tcp&security=reality&flow=xtls-rprx-vision&fp=chrome&pbk=Z3ZGnAOdKkzJ07gR_7_0k9_iTTFP6paDOrqx1rN2LU4&sni=www.icloud.com# By EbraSha 🌀",
+      "countryCode": "JP",
+      "countryName": "JP",
+      "pingMs": 1334
+    },
+    {
+      "config": "vless://86b414b6-966e-4f6d-ab16-32049ef732d3@47.245.38.111:443/?type=raw&encryption=none&sni=www.autodesk.com&fp=chrome&security=reality&pbk=y167aJhpgWWjltY4UCir_uu8Mj__Hkc1W4etD0QXYH4&sid=860705e716cbe6ed# By EbraSha 🐉",
+      "countryCode": "JP",
+      "countryName": "JP",
+      "pingMs": 1495
+    }
+  ],
+  "SG": [
+    {
+      "config": "vless://06b65903-406d-4a41-8463-6fd5c0ee7798@149.104.6.78:8443?encryption=none&security=tls&sni=sn1.skylee5.cloudns.ch&fp=chrome&insecure=0&allowInsecure=0&type=ws&host=sn1.skylee5.cloudns.ch&path=%2F# By EbraSha 🪐",
+      "countryCode": "SG",
+      "countryName": "SG",
+      "pingMs": 1013
+    },
+    {
+      "config": "vless://6202b230-417c-4d8e-b624-0f71afa9c75d@154.194.12.238:2096?encryption=none&host=sni.jpmj.dev&security=tls&sni=sni.jpmj.dev&type=ws# By EbraSha 🌍",
+      "countryCode": "SG",
+      "countryName": "SG",
+      "pingMs": 1201
+    },
+    {
+      "config": "vless://6202b230-417c-4d8e-b624-0f71afa9c75d@154.194.12.138:2096?allowInsecure=1&encryption=none&host=sni.111000.indevs.in&security=tls&sni=sni.111000.indevs.in&type=ws# By EbraSha 🔋",
+      "countryCode": "SG",
+      "countryName": "SG",
+      "pingMs": 1214
+    },
+    {
+      "config": "vless://06b65903-406d-4a41-8463-6fd5c0ee7798@91.192.81.154:2053?encryption=none&security=tls&sni=sn1.skylee5.cloudns.ch&type=ws&host=sn1.skylee5.cloudns.ch&path=%2Fproxyip%3Dproxyip.cmliussss.net# By EbraSha 🧬",
+      "countryCode": "SG",
+      "countryName": "SG",
+      "pingMs": 1229
+    },
+    {
+      "config": "vless://06b65903-406d-4a41-8463-6fd5c0ee7798@43.160.251.110:443?type=ws&security=tls&encryption=none&sni=sn1.skylee5.cloudns.ch&host=sn1.skylee5.cloudns.ch# By EbraSha 🧩",
+      "countryCode": "SG",
+      "countryName": "SG",
+      "pingMs": 1303
+    }
+  ],
+  "NL": [
+    {
+      "config": "trojan://8r%3C%5B9%27l6hAO%238ZQi@185.162.9.60:8443?security=tls&sni=Koma-YT.PAGeS.Dev&type=ws&host=Koma-YT.PAGeS.Dev&path=/trTelegram%F0%9F%87%A8%F0%9F%87%B3%2B%40WangCai2# By EbraSha 🤖",
+      "countryCode": "NL",
+      "countryName": "NL",
+      "pingMs": 503
+    },
+    {
+      "config": "trojan://8r%3C%5B9%27l6hAO%238ZQi@185.164.163.173:8443?host=Koma-YT.PAGeS.Dev&path=/trTelegram%F0%9F%87%A8%F0%9F%87%B3+%40WangCai2&security=tls&sni=Koma-YT.PAGeS.Dev&type=ws# By EbraSha 🔥",
+      "countryCode": "NL",
+      "countryName": "NL",
+      "pingMs": 524
+    },
+    {
+      "config": "trojan://8r%3C%5B9%27l6hAO%238ZQi@185.164.163.172:2053?host=Koma-YT.PAGeS.Dev&path=/trTelegram%F0%9F%87%A8%F0%9F%87%B3+%40WangCai2&security=tls&sni=Koma-YT.PAGeS.Dev&type=ws# By EbraSha 🛡️",
+      "countryCode": "NL",
+      "countryName": "NL",
+      "pingMs": 542
+    },
+    {
+      "config": "trojan://8r%3C%5B9%27l6hAO%238ZQi@178.173.255.14:8443?host=Koma-YT.PAGeS.Dev&path=/trTelegram%F0%9F%87%A8%F0%9F%87%B3+%40WangCai2&security=tls&sni=Koma-YT.PAGeS.Dev&type=ws# By EbraSha 🪖",
+      "countryCode": "NL",
+      "countryName": "NL",
+      "pingMs": 561
+    },
+    {
+      "config": "trojan://8r%3C%5B9%27l6hAO%238ZQi@185.157.214.38:8443?host=Koma-YT.PAGeS.Dev&path=/trTelegram%F0%9F%87%A8%F0%9F%87%B3+%40WangCai2&security=tls&sni=Koma-YT.PAGeS.Dev&type=ws# By EbraSha 🌀",
+      "countryCode": "NL",
+      "countryName": "NL",
+      "pingMs": 582
+    }
+  ],
+  "GB": [
+    {
+      "config": "trojan://trojan@91.193.58.0:443/?type=ws&path=%2F&security=tls&sni=wahaha.yingyangkuaixian.dpdns.org# By EbraSha 🚨",
+      "countryCode": "GB",
+      "countryName": "GB",
+      "pingMs": 160
+    },
+    {
+      "config": "vless://e5f8a9f6-f164-479b-b3b5-b90f213c7145@141.101.121.180:2053?encryption=none&security=tls&sni=ir1.airpanel.top&fp=chrome&insecure=0&allowInsecure=0&type=ws&host=ir1.airpanel.top&path=%2F# By EbraSha 🎛️",
+      "countryCode": "GB",
+      "countryName": "GB",
+      "pingMs": 597
+    },
+    {
+      "config": "vless://e5f8a9f6-f164-479b-b3b5-b90f213c7145@141.101.121.14:2053?encryption=none&security=tls&sni=ir1.airpanel.top&fp=chrome&insecure=0&allowInsecure=0&type=ws&host=ir1.airpanel.top&path=%2F# By EbraSha 🧪",
+      "countryCode": "GB",
+      "countryName": "GB",
+      "pingMs": 614
+    },
+    {
+      "config": "vless://e5f8a9f6-f164-479b-b3b5-b90f213c7145@141.101.121.115:2053?path=%2F&security=tls&encryption=none&insecure=1&host=ir1.airpanel.top&type=ws&allowInsecure=1&sni=ir1.airpanel.top# By EbraSha 🦇",
+      "countryCode": "GB",
+      "countryName": "GB",
+      "pingMs": 630
+    },
+    {
+      "config": "trojan://8r%3C%5B9%27l6hAO%238ZQi@178.157.82.110:2053?host=Koma-YT.PAGeS.Dev&path=/trTelegram%F0%9F%87%A8%F0%9F%87%B3+%40WangCai2&security=tls&sni=Koma-YT.PAGeS.Dev&type=ws# By EbraSha 🥷",
+      "countryCode": "GB",
+      "countryName": "GB",
+      "pingMs": 655
+    }
+  ],
+  "ES": [
+    {
+      "config": "trojan://trojan@109.234.211.66:8443/?type=ws&host=store.timimi.dpdns.org&path=%2F&security=tls&sni=store.timimi.dpdns.org# By EbraSha 🦅",
+      "countryCode": "ES",
+      "countryName": "ES",
+      "pingMs": 114
+    },
+    {
+      "config": "vless://1e9aadae-ca17-4f75-b0a0-7de5e3858cfb@185.18.250.117:443?path=%2FTelegram%40Linkvws%3Fed%3D2560&security=tls&encryption=none&host=xn----pmcnaac0dkn0rb71nda.pages.dev&type=ws&sni=xN----PMcNAAC0DKn0Rb71nDa.PAges.Dev# By EbraSha 🛡️",
+      "countryCode": "ES",
+      "countryName": "ES",
+      "pingMs": 862
+    },
+    {
+      "config": "vless://f775978b-6e22-41a8-ae5e-5f9779e6745f@185.18.250.185:2053?encryption=none&security=tls&sni=juzibaipiao.5112233.xyz&type=ws&host=juzibaipiao.5112233.xyz&path=%2f%3fed%3d2048# By EbraSha 📶",
+      "countryCode": "ES",
+      "countryName": "ES",
+      "pingMs": 1203
+    }
+  ],
+  "AU": [
+    {
+      "config": "vless://ba7556ea-2e96-4463-a6f2-f2ab3579a653@1.1.1.1:443?security=tls&sni=vlessct-ws-channel-vpnctvip.vpnctvip.dns-dYnaMIC.NET&type=ws&host=vlessct-ws-channel-vpnctvip.vpnctvip.dns-dYnaMIC.NET&path=%2Firanukiraniukwbpbct.majidcttls.onflashdrive.app%2FMaJiDcT%2F%3Fed%3D2084&fp=random&alpn=h3%2Ch2%2Chttp%2F1.1# By EbraSha 🦇",
+      "countryCode": "AU",
+      "countryName": "AU",
+      "pingMs": 1359
+    }
+  ],
+  "TR": [
+    {
+      "config": "trojan://8r%3C%5B9%27l6hAO%238ZQi@185.113.223.183:8443?security=tls&sni=Koma-YT.PAGeS.Dev&type=ws&host=Koma-YT.PAGeS.Dev&path=/trTelegram%F0%9F%87%A8%F0%9F%87%B3%2B%40WangCai2# By EbraSha 🌀",
+      "countryCode": "TR",
+      "countryName": "TR",
+      "pingMs": 765
+    },
+    {
+      "config": "vless://f775978b-6e22-41a8-ae5e-5f9779e6745f@86.38.214.101:2096/?type=ws&encryption=none&host=juzibaipiao.5112233.xyz&path=%2F%3Fed%3D2048&security=tls&sni=juzibaipiao.5112233.xyz&fp=chrome# By EbraSha 🔮",
+      "countryCode": "TR",
+      "countryName": "TR",
+      "pingMs": 1283
+    },
+    {
+      "config": "trojan://tunnel-telegram-ibahad@193.124.46.134:8441?security=tls&alpn=http%2F1.1&host=tr-1.stunnel.cc&headerType=none&type=tcp&sni=creativecommons.org# By EbraSha 🥷",
+      "countryCode": "TR",
+      "countryName": "TR",
+      "pingMs": 1418
+    }
+  ]
+}
