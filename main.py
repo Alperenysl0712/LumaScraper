@@ -37,7 +37,6 @@ SOURCES = [
     "https://raw.githubusercontent.com/ebrasha/free-v2ray-public-list/main/vless_configs.txt",
     "https://raw.githubusercontent.com/ebrasha/free-v2ray-public-list/main/trojan_configs.txt",
     "https://raw.githubusercontent.com/ebrasha/free-v2ray-public-list/main/vmess_configs.txt",
-    "https://raw.githubusercontent.com/ebrasha/free-v2ray-public-list/main/ss_configs.txt",
     "https://raw.githubusercontent.com/barry-far/V2ray-Config/main/Splitted-By-Protocol/vless.txt",
     "https://raw.githubusercontent.com/barry-far/V2ray-Config/main/Splitted-By-Protocol/trojan.txt",
     "https://raw.githubusercontent.com/yebekhe/TelegramV2rayCollector/main/sub/normal/mix",
@@ -94,7 +93,7 @@ def parse_config(link):
             return None
 
         protocol = link.split('://')[0].lower()
-        if protocol not in ['vless', 'trojan', 'ss', 'vmess']:
+        if protocol not in ['vless', 'trojan', 'vmess']:
             return None
 
         match = re.search(r'@([^:]+):(\d+)', link)
