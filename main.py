@@ -62,7 +62,7 @@ def decode_base64(data):
         return base64.b64decode(data).decode('utf-8')
     except: return data
 
-def predict_true_egress(link, sni, host, remark):
+def predict_true_egress(remark, sni, host):
     space = f"{remark} {sni} {host}".upper()
     for code, patterns in COUNTRY_MAPPINGS.items():
         for p in patterns:
@@ -109,25 +109,23 @@ def parse_config(link):
         if 'security=reality' in link and 'fragment=' not in link:
             link += '&fragment=10-20,10-20,tlshello'
 
-        country = predict_true_egress(link, sni, host, remark)
+        country = predict_true_egress(remark, sni, host)
 
         return {"link": link, "ip": ip, "port": port, "sni": sni, "host": host, "path": path, "country": country}
     except: return None
 
 async def _do_validate(node):
-    ip, port, sni, host, path = node['ip'], node['port'], node['sni'] or node['host'] or ip, node['host'] or sni, node['path']
+    ip, port, sni, host, path = node['ip'], node['port'], node['sni'] or node['host'] or node['ip'], node['host'] or node['sni'], node['path']
     start = time.time()
     writer = None 
     try:
         context = ssl.create_default_context()
         context.check_hostname = False
         context.verify_mode = ssl.CERT_NONE
-        
         valid_sni = sni if sni and not re.match(r"^\d{1,3}(\.\d{1,3}){3}$", sni) else None
         if valid_sni:
             try: valid_sni.encode('idna')
             except: valid_sni = None
-        
         reader, writer = await asyncio.wait_for(asyncio.open_connection(ip, port, ssl=context, server_hostname=valid_sni), timeout=CONNECTION_TIMEOUT)
         req = (f"GET / HTTP/1.1\r\nHost: iplocation.net\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nUser-Agent: LumaShield/1.0\r\n\r\n").encode('utf-8')
         writer.write(req)
@@ -135,7 +133,6 @@ async def _do_validate(node):
         resp = await asyncio.wait_for(reader.read(2048), timeout=5.0)
         writer.close()
         await writer.wait_closed()
-        
         if b"<html" in resp.lower() or b"http/1.1 200" in resp.lower():
             node['ping'] = int((time.time() - start) * 1000)
             return node
@@ -146,42 +143,63 @@ async def _do_validate(node):
             try: writer.close()
             except: pass
 
+async def validate_node(node, semaphore):
+    async with semaphore:
+        return await asyncio.wait_for(_do_validate(node), timeout=CONNECTION_TIMEOUT + 2.0)
+
+async def resolve_fallback_countries(nodes):
+    unknown = [n for n in nodes if n['country'] is None]
+    if not unknown: return nodes
+    ips = list(set([n['ip'] for n in unknown]))
+    ip_to_country = {}
+    async with aiohttp.ClientSession() as session:
+        for i in range(0, len(ips), 100):
+            try:
+                async with session.post("http://ip-api.com/batch?fields=query,countryCode,status", json=ips[i:i+100], timeout=5) as resp:
+                    if resp.status == 200:
+                        for item in await resp.json():
+                            if item.get('status') == 'success': ip_to_country[item['query']] = item.get('countryCode')
+            except: pass
+    for n in nodes:
+        if n['country'] is None: n['country'] = ip_to_country.get(n['ip'], 'UN')
+    return nodes
+
 async def main():
     raw_links = []
     async with aiohttp.ClientSession() as session:
         for url in SOURCES:
             try:
-                async with session.get(url, timeout=6) as response:
-                    if response.status == 200:
-                        text = await response.text()
+                async with session.get(url, timeout=6) as resp:
+                    if resp.status == 200:
+                        text = await resp.text()
                         if "://" not in text: text = decode_base64(text)
                         raw_links.extend(text.splitlines())
             except: continue
-
+    
     unique_ips, parsed_nodes = set(), []
     for link in raw_links:
         node = parse_config(link)
         if node and node['ip'] not in unique_ips:
             unique_ips.add(node['ip'])
             parsed_nodes.append(node)
-
+    
     sem = asyncio.Semaphore(CONCURRENCY_LIMIT)
-    results = await asyncio.gather(*[asyncio.wait_for(validate_node(n, sem), timeout=8.0) for n in parsed_nodes], return_exceptions=True)
+    results = await asyncio.gather(*[validate_node(n, sem) for n in parsed_nodes], return_exceptions=True)
     alive = [res for res in results if isinstance(res, dict)]
     
-    country_pools = {}
+    pools = {}
     for node in await resolve_fallback_countries(alive):
         c = node['country']
         if not c or c not in COUNTRY_MAPPINGS: continue
-        country_pools.setdefault(c, []).append(node)
-
-    json_out = {}
-    for country, nodes in country_pools.items():
+        pools.setdefault(c, []).append(node)
+    
+    out = {}
+    for country, nodes in pools.items():
         nodes.sort(key=lambda x: x['ping'])
-        json_out[country] = [{"config": n['link'], "countryCode": country, "countryName": country, "pingMs": n['ping']} for n in nodes[:TOP_NODES_PER_COUNTRY]]
-
+        out[country] = [{"config": n['link'], "countryCode": country, "countryName": country, "pingMs": n['ping']} for n in nodes[:TOP_NODES_PER_COUNTRY]]
+    
     with open('luma_premium_nodes.json', 'w', encoding='utf-8') as f:
-        json.dump(json_out, f, ensure_ascii=False, indent=2)
+        json.dump(out, f, ensure_ascii=False, indent=2)
 
 if __name__ == "__main__":
     asyncio.run(main())
