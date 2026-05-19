@@ -28,11 +28,113 @@ SOURCES = [
     "https://raw.githubusercontent.com/ebrasha/free-v2ray-public-list/main/vless_configs.txt",
     "https://raw.githubusercontent.com/ebrasha/free-v2ray-public-list/main/trojan_configs.txt",
     "https://raw.githubusercontent.com/ebrasha/free-v2ray-public-list/main/vmess_configs.txt",
+    "https://raw.githubusercontent.com/ebrasha/free-v2ray-public-list/main/hysteria2_configs.txt",
+    "https://raw.githubusercontent.com/ebrasha/free-v2ray-public-list/main/ss_configs.txt",
+    "https://raw.githubusercontent.com/ebrasha/free-v2ray-public-list/main/tuic_configs.txt",
     "https://raw.githubusercontent.com/barry-far/V2ray-Config/main/Splitted-By-Protocol/vless.txt",
     "https://raw.githubusercontent.com/barry-far/V2ray-Config/main/Splitted-By-Protocol/trojan.txt",
     "https://raw.githubusercontent.com/yebekhe/TelegramV2rayCollector/main/sub/normal/mix",
     "https://raw.githubusercontent.com/Leon406/Sub/master/sub/configs.txt",
-    "https://raw.githubusercontent.com/freefq/free/master/v2"
+    "https://raw.githubusercontent.com/freefq/free/master/v2",
+    "https://raw.githubusercontent.com/V2RAYCONFIGSPOOL/V2RAY_SUB/main/v2ray_configs_no1.txt",
+    "https://raw.githubusercontent.com/V2RAYCONFIGSPOOL/V2RAY_SUB/main/v2ray_configs_no2.txt",
+    "https://raw.githubusercontent.com/V2RAYCONFIGSPOOL/V2RAY_SUB/main/v2ray_configs_no3.txt",
+    "https://raw.githubusercontent.com/V2RAYCONFIGSPOOL/V2RAY_SUB/main/v2ray_configs_no4.txt",
+    "https://raw.githubusercontent.com/V2RAYCONFIGSPOOL/V2RAY_SUB/main/v2ray_configs_no5.txt",
+    "https://raw.githubusercontent.com/V2RAYCONFIGSPOOL/V2RAY_SUB/main/v2ray_configs_no6.txt",
+    "https://raw.githubusercontent.com/V2RAYCONFIGSPOOL/V2RAY_SUB/main/v2ray_configs_no7.txt",
+    "https://raw.githubusercontent.com/V2RAYCONFIGSPOOL/V2RAY_SUB/main/v2ray_configs_no8.txt",
+    "https://raw.githubusercontent.com/V2RAYCONFIGSPOOL/V2RAY_SUB/main/v2ray_configs_no9.txt",
+    "https://raw.githubusercontent.com/V2RAYCONFIGSPOOL/V2RAY_SUB/main/v2ray_configs_no10.txt",
+    "https://raw.githubusercontent.com/MustafaBaqer/VestraNet-Nodes/main/vless.txt",
+    "https://raw.githubusercontent.com/MustafaBaqer/VestraNet-Nodes/main/vmess.txt",
+    "https://raw.githubusercontent.com/MustafaBaqer/VestraNet-Nodes/main/trojan.txt",
+    "https://raw.githubusercontent.com/MustafaBaqer/VestraNet-Nodes/main/shadowsocks.txt",
+    "https://raw.githubusercontent.com/MustafaBaqer/VestraNet-Nodes/main/hy2.txt",
+    "https://raw.githubusercontent.com/MustafaBaqer/VestraNet-Nodes/main/tuic.txt",
+    "https://raw.githubusercontent.com/SoliSpirit/SolVPN/main/Countrys/Germany.txt",
+    "https://raw.githubusercontent.com/SoliSpirit/SolVPN/main/Countrys/Spain.txt",
+    "https://raw.githubusercontent.com/SoliSpirit/SolVPN/main/Countrys/Netherlands.txt",
+    "https://raw.githubusercontent.com/SoliSpirit/SolVPN/main/Countrys/Türkiye.txt",
+    "https://raw.githubusercontent.com/SoliSpirit/SolVPN/main/Countrys/Italy.txt",
+    "https://raw.githubusercontent.com/SoliSpirit/SolVPN/main/Countrys/Canada.txt",
+    "https://raw.githubusercontent.com/SoliSpirit/SolVPN/main/Countrys/Singapore.txt",
+    "https://raw.githubusercontent.com/SoliSpirit/SolVPN/main/Countrys/France.txt",
+    "https://raw.githubusercontent.com/SoliSpirit/SolVPN/main/Countrys/United_Kingdom.txt",
+    "https://raw.githubusercontent.com/SoliSpirit/SolVPN/main/Countrys/United_States.txt",
+    "https://raw.githubusercontent.com/SoliSpirit/SolVPN/main/Countrys/Australia.txt",
+    "https://raw.githubusercontent.com/SoliSpirit/SolVPN/main/Countrys/Japan.txt",
+    "https://raw.githubusercontent.com/SoliSpirit/SolVPN/main/Protocols/vless.txt",
+    "https://raw.githubusercontent.com/SoliSpirit/SolVPN/main/Protocols/vmess.txt",
+    "https://raw.githubusercontent.com/SoliSpirit/SolVPN/main/Protocols/trojan.txt",
+    "https://raw.githubusercontent.com/SoliSpirit/SolVPN/main/Protocols/shadowsocks.txt",
+    "https://raw.githubusercontent.com/ALIILAPRO/v2rayNG-Config/main/sub.txt",
+    "https://raw.githubusercontent.com/Epodonios/v2ray-configs/main/Splitted-By-Protocol/ss.txt",
+    "https://raw.githubusercontent.com/Epodonios/v2ray-configs/main/Splitted-By-Protocol/ssr.txt",
+    "https://raw.githubusercontent.com/Epodonios/v2ray-configs/main/Splitted-By-Protocol/trojan.txt",
+    "https://raw.githubusercontent.com/Epodonios/v2ray-configs/main/Splitted-By-Protocol/vless.txt",
+    "https://raw.githubusercontent.com/Epodonios/v2ray-configs/main/Splitted-By-Protocol/vmess.txt",
+    "https://raw.githubusercontent.com/V2RayRoot/V2RayConfig/main/Config/shadowsocks.txt",
+    "https://raw.githubusercontent.com/V2RayRoot/V2RayConfig/main/Config/vless.txt",
+    "https://raw.githubusercontent.com/V2RayRoot/V2RayConfig/main/Config/vmess.txt",
+    "https://raw.githubusercontent.com/skywrt/v2ray-configs/main/All_Configs_Sub.txt",
+    "https://raw.githubusercontent.com/skywrt/v2ray-Collector/master/v2ray",
+    "https://raw.githubusercontent.com/10ium/V2ray-Config/main/All_Configs_Sub.txt",
+    "https://raw.githubusercontent.com/10ium/V2rayCollector/main/mixed_iran.txt",
+    "https://raw.githubusercontent.com/10ium/V2rayCollectorLite/main/mixed_iran.txt",
+    "https://raw.githubusercontent.com/10ium/V2RayAggregator/master/Eternity.txt",
+    "https://raw.githubusercontent.com/10ium/V2Hub3/main/merged",
+    "https://raw.githubusercontent.com/10ium/multi-proxy-config-fetcher/main/configs/proxy_configs.txt",
+    "https://raw.githubusercontent.com/Abdulhossein/Autov2rayLeecher/main/sub/Mix/mix.txt",
+    "https://raw.githubusercontent.com/Argh94/V2RayAutoConfig/main/configs/Hysteria2.txt",
+    "https://raw.githubusercontent.com/Argh94/V2RayAutoConfig/main/configs/ShadowSocks.txt",
+    "https://raw.githubusercontent.com/Argh94/V2RayAutoConfig/main/configs/ShadowSocksR.txt",
+    "https://raw.githubusercontent.com/Argh94/V2RayAutoConfig/main/configs/Trojan.txt",
+    "https://raw.githubusercontent.com/Argh94/V2RayAutoConfig/main/configs/Tuic.txt",
+    "https://raw.githubusercontent.com/Argh94/V2RayAutoConfig/main/configs/Vless.txt",
+    "https://raw.githubusercontent.com/Argh94/V2RayAutoConfig/main/configs/Vmess.txt",
+    "https://raw.githubusercontent.com/Kwinshadow/TelegramV2rayCollector/main/sublinks/mix.txt",
+    "https://raw.githubusercontent.com/M-Mashreghi/Free-V2ray-Collector/main/Splitted-By-Protocol/ss.txt",
+    "https://raw.githubusercontent.com/M-Mashreghi/Free-V2ray-Collector/main/Splitted-By-Protocol/ssr.txt",
+    "https://raw.githubusercontent.com/M-Mashreghi/Free-V2ray-Collector/main/Splitted-By-Protocol/trojan.txt",
+    "https://raw.githubusercontent.com/M-Mashreghi/Free-V2ray-Collector/main/Splitted-By-Protocol/vless.txt",
+    "https://raw.githubusercontent.com/M-Mashreghi/Free-V2ray-Collector/main/Splitted-By-Protocol/vmess.txt",
+    "https://raw.githubusercontent.com/MahsaNetConfigTopic/config/main/xray_final.txt",
+    "https://raw.githubusercontent.com/MatinGhanbari/v2ray-configs/main/subscriptions/v2ray/all_sub.txt",
+    "https://raw.githubusercontent.com/MhdiTaheri/V2rayCollector/main/sub/mix",
+    "https://raw.githubusercontent.com/Mosifree/-FREE2CONFIG/main/Reality",
+    "https://raw.githubusercontent.com/Mosifree/-FREE2CONFIG/main/SS",
+    "https://raw.githubusercontent.com/Mosifree/-FREE2CONFIG/main/T,H",
+    "https://raw.githubusercontent.com/Mosifree/-FREE2CONFIG/main/Vless",
+    "https://raw.githubusercontent.com/SamanGho/v2ray_collector/main/v2tel_links1.txt",
+    "https://raw.githubusercontent.com/SamanGho/v2ray_collector/main/v2tel_links2.txt",
+    "https://raw.githubusercontent.com/SoliSpirit/v2ray-configs/main/all_configs.txt",
+    "https://raw.githubusercontent.com/arshiacomplus/v2rayExtractor/main/mix/sub.html",
+    "https://raw.githubusercontent.com/arshiacomplus/v2rayExtractor/main/ss.html",
+    "https://raw.githubusercontent.com/arshiacomplus/v2rayExtractor/main/trojan.html",
+    "https://raw.githubusercontent.com/arshiacomplus/v2rayExtractor/main/vless.html",
+    "https://raw.githubusercontent.com/arshiacomplus/v2rayExtractor/main/vmess.html",
+    "https://raw.githubusercontent.com/azadiazinjamigzare/Service/main/Sub",
+    "https://raw.githubusercontent.com/barry-far/V2ray-Config/main/All_Configs_Sub.txt",
+    "https://raw.githubusercontent.com/coldwater-10/V2ray-Config/main/Splitted-By-Protocol/hysteria2.txt",
+    "https://raw.githubusercontent.com/coldwater-10/V2ray-Config/main/Splitted-By-Protocol/ss.txt",
+    "https://raw.githubusercontent.com/coldwater-10/V2ray-Config/main/Splitted-By-Protocol/trojan.txt",
+    "https://raw.githubusercontent.com/coldwater-10/V2ray-Config/main/Splitted-By-Protocol/tuic.txt",
+    "https://raw.githubusercontent.com/coldwater-10/V2ray-Config/main/Splitted-By-Protocol/vless.txt",
+    "https://raw.githubusercontent.com/coldwater-10/V2ray-Config/main/Splitted-By-Protocol/vmess.txt",
+    "https://raw.githubusercontent.com/darknessm427/Sub/main/Ss",
+    "https://raw.githubusercontent.com/darknessm427/Sub/main/V2mix",
+    "https://raw.githubusercontent.com/darknessm427/Sub/main/V2ss",
+    "https://raw.githubusercontent.com/darknessm427/Sub/main/Warp/Nikav4",
+    "https://raw.githubusercontent.com/darknessm427/Sub/main/Warp/Nikav6",
+    "https://raw.githubusercontent.com/hamedp-71/Trojan/main/hp.txt",
+    "https://raw.githubusercontent.com/hamedp-71/openproxylist/main/V2RAY.txt",
+    "https://raw.githubusercontent.com/hamedp-71/openproxylist/main/V2RAY_RAW.txt",
+    "https://raw.githubusercontent.com/itsyebekhe/PSG/main/lite/subscriptions/xray/normal/mix",
+    "https://raw.githubusercontent.com/itsyebekhe/PSG/main/subscriptions/xray/normal/mix",
+    "https://raw.githubusercontent.com/mahdibland/ShadowsocksAggregator/master/sub/sub_merge.txt",
+    "https://raw.githubusercontent.com/roosterkid/openproxylist/main/V2RAY_BASE64.txt",
+    "https://raw.githubusercontent.com/youfoundamin/V2rayCollector/main/mixed_iran.txt"
 ]
 
 MAX_PING_MS = 1500
@@ -84,11 +186,15 @@ def parse_config(link):
 
         if proto == 'vmess':
             b64 = link[8:]
+            if '#' in b64:
+                b64, rem = b64.split('#', 1)
+                remark = urllib.parse.unquote(rem)
             b64 += '=' * (-len(b64) % 4)
             v = json.loads(base64.b64decode(b64).decode('utf-8'))
             ip, port = v.get('add', ''), int(v.get('port', 443))
             sni, host = v.get('sni', ''), v.get('host', '')
-            path, remark = v.get('path', '/'), v.get('ps', '')
+            path = v.get('path', '/')
+            if not remark: remark = v.get('ps', '')
             if str(v.get('tls', '')).lower() != 'tls': return None
         else:
             match = re.search(r'@([^:]+):(\d+)', link)
@@ -107,7 +213,7 @@ def parse_config(link):
             link = link.replace('type=ws', 'type=grpc').replace('ws=1', 'grpc=1')
         
         if 'security=reality' in link and 'fragment=' not in link:
-            link += '&fragment=10-20,10-20,tlshello'
+            link += '&fragment=1-5,1-5,tlshello'
 
         country = predict_true_egress(remark, sni, host)
 
@@ -133,7 +239,7 @@ async def _do_validate(node):
         resp = await asyncio.wait_for(reader.read(2048), timeout=5.0)
         writer.close()
         await writer.wait_closed()
-        if b"<html" in resp.lower() or b"http/1.1 200" in resp.lower():
+        if b"<html" in resp.lower() or b"http/1.1 200" in resp.lower() or b"connection established" in resp.lower():
             node['ping'] = int((time.time() - start) * 1000)
             return node
         return None
@@ -145,7 +251,7 @@ async def _do_validate(node):
 
 async def validate_node(node, semaphore):
     async with semaphore:
-        return await asyncio.wait_for(_do_validate(node), timeout=CONNECTION_TIMEOUT + 2.0)
+        return await asyncio.wait_for(_do_validate(node), timeout=CONNECTION_TIMEOUT + 3.0)
 
 async def resolve_fallback_countries(nodes):
     unknown = [n for n in nodes if n['country'] is None]
@@ -169,7 +275,7 @@ async def main():
     async with aiohttp.ClientSession() as session:
         for url in SOURCES:
             try:
-                async with session.get(url, timeout=6) as resp:
+                async with session.get(url, timeout=8) as resp:
                     if resp.status == 200:
                         text = await resp.text()
                         if "://" not in text: text = decode_base64(text)
