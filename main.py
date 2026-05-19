@@ -7,11 +7,10 @@ Created by Alperen Burak Yeşil
 
 Description:
 This backend aggregator fetches, deduplicates, and evaluates premium VPN nodes.
-It specifically destroys "Cloudflare Traps" (Anycast IPs with dead origins) 
-using an advanced Layer 7 (L7) HTTP/TLS Deep Probe. Instead of heavy binary 
-executions, it simulates a raw Xray WebSocket handshake. Nodes returning 
-HTTP 5xx (502, 530) are purged instantly, ensuring the mobile app receives 
-ONLY nodes with guaranteed internet egress.
+*NEW*: It now acts as a Strict Security Dictator. It ruthlessly drops ANY node 
+that does not use TLS encryption (Port 443, 8443, etc.) or lacks security=tls/reality. 
+This guarantees that nodes survive Deep Packet Inspection (DPI) in heavily 
+censored regions (like Turkey).
 ================================================================================
 """
 
@@ -37,7 +36,7 @@ SOURCES = [
 
 MAX_PING_MS = 1500
 CONNECTION_TIMEOUT = 3.0
-TOP_NODES_PER_COUNTRY = 5
+TOP_NODES_PER_COUNTRY = 10 
 CONCURRENCY_LIMIT = 150
 
 COUNTRY_MAPPINGS = {
@@ -87,6 +86,11 @@ def parse_config(link):
         if protocol not in ['vless', 'trojan', 'vmess']:
             return None
 
+        if protocol in ['vless', 'trojan']:
+            link_lower = link.lower()
+            if 'security=tls' not in link_lower and 'security=reality' not in link_lower:
+                return None
+
         ip, port, sni, host, path = "", 0, "", "", "/"
 
         if protocol == 'vmess':
@@ -98,6 +102,8 @@ def parse_config(link):
             sni = v.get('sni', '')
             host = v.get('host', '')
             path = v.get('path', '/')
+            if str(v.get('tls', '')).lower() != 'tls':
+                return None
         else:
             match = re.search(r'@([^:]+):(\d+)', link)
             if not match: return None
@@ -109,16 +115,10 @@ def parse_config(link):
             host = query_params.get('host', [''])[0]
             path = query_params.get('path', ['/'])[0]
         
+        if port not in [443, 8443, 2053, 2083, 2087, 2096]:
+            return None
+
         if not sni: sni = host
-
-        if protocol == 'vless' and port == 443:
-            if 'alpn=http/1.1' not in link:
-                link += '&alpn=http/1.1'
-            
-            link = re.sub(r'sni=[^&]+', 'sni=speedtest.net', link)
-            sni = 'speedtest.net'
-
-        
 
         predicted_country = predict_true_egress(link, ip, sni, host)
 
@@ -145,47 +145,34 @@ async def _do_validate(node):
     writer = None 
 
     try:
-        requires_tls = port in [443, 8443, 2053, 2083, 2087, 2096] or 'tls' in node['link'].lower()
+        context = ssl.create_default_context()
+        context.check_hostname = False
+        context.verify_mode = ssl.CERT_NONE
         
-        if requires_tls:
-            context = ssl.create_default_context()
-            context.check_hostname = False
-            context.verify_mode = ssl.CERT_NONE
-            
-            valid_sni = sni if sni and not re.match(r"^\d{1,3}(\.\d{1,3}){3}$", sni) else None
-            
-            reader, writer = await asyncio.wait_for(
-                asyncio.open_connection(ip, port, ssl=context, server_hostname=valid_sni),
-                timeout=CONNECTION_TIMEOUT
-            )
+        valid_sni = sni if sni and not re.match(r"^\d{1,3}(\.\d{1,3}){3}$", sni) else None
+        
+        reader, writer = await asyncio.wait_for(
+            asyncio.open_connection(ip, port, ssl=context, server_hostname=valid_sni),
+            timeout=CONNECTION_TIMEOUT
+        )
 
-            req = (f"GET {path} HTTP/1.1\r\n"
-                   f"Host: {host}\r\n"
-                   f"Upgrade: websocket\r\n"
-                   f"Connection: Upgrade\r\n"
-                   f"User-Agent: LumaShield-Validator/1.0\r\n\r\n").encode('utf-8')
-            
-            writer.write(req)
-            await writer.drain()
+        req = (f"GET {path} HTTP/1.1\r\n"
+               f"Host: {host}\r\n"
+               f"Upgrade: websocket\r\n"
+               f"Connection: Upgrade\r\n"
+               f"User-Agent: LumaShield-Validator/1.0\r\n\r\n").encode('utf-8')
+        
+        writer.write(req)
+        await writer.drain()
 
-            resp = await asyncio.wait_for(reader.read(1024), timeout=CONNECTION_TIMEOUT)
+        resp = await asyncio.wait_for(reader.read(1024), timeout=CONNECTION_TIMEOUT)
+        resp_str = resp.decode('utf-8', errors='ignore')
 
-            resp_str = resp.decode('utf-8', errors='ignore')
+        if "HTTP/1.1 5" in resp_str or "502 Bad Gateway" in resp_str or "Error 5" in resp_str:
+            return None 
 
-            # Sahte Cloudflare yakalama
-            if "HTTP/1.1 5" in resp_str or "502 Bad Gateway" in resp_str or "Error 5" in resp_str:
-                return None 
-
-            if len(resp) == 0:
-                return None 
-
-        else:
-            reader, writer = await asyncio.wait_for(
-                asyncio.open_connection(ip, port),
-                timeout=CONNECTION_TIMEOUT
-            )
-            writer.write(b"\x00" * 10)
-            await writer.drain()
+        if len(resp) == 0:
+            return None 
 
         latency = int((time.time() - start_time) * 1000)
         if latency <= MAX_PING_MS:
@@ -265,7 +252,7 @@ async def main():
             unique_ips.add(node['ip'])
             parsed_nodes.append(node)
 
-    print(f"Scraped {len(parsed_nodes)} unique nodes. Beginning L7 Deep Probe validation...")
+    print(f"Scraped {len(parsed_nodes)} STRICTLY ENCRYPTED (Port 443/TLS) unique nodes. Beginning L7 Deep Probe validation...")
     
     semaphore = asyncio.Semaphore(CONCURRENCY_LIMIT)
     tasks = [validate_node(node, semaphore) for node in parsed_nodes]
@@ -273,7 +260,7 @@ async def main():
     results = await asyncio.gather(*tasks, return_exceptions=True)
 
     alive_nodes = [res for res in results if isinstance(res, dict)]
-    print(f"Validation complete. {len(alive_nodes)} real nodes survived the Cloudflare trap check.")
+    print(f"Validation complete. {len(alive_nodes)} bulletproof nodes survived the Cloudflare trap check.")
 
     verified_nodes = await resolve_fallback_countries(alive_nodes)
 
