@@ -156,39 +156,34 @@ async def _do_validate(node):
             timeout=CONNECTION_TIMEOUT
         )
 
-        req = (f"GET {path} HTTP/1.1\r\n"
-               f"Host: {host}\r\n"
+        req = (f"GET / HTTP/1.1\r\n"
+               f"Host: iplocation.net\r\n"
                f"Upgrade: websocket\r\n"
                f"Connection: Upgrade\r\n"
-               f"User-Agent: LumaShield-Validator/1.0\r\n\r\n").encode('utf-8')
+               f"User-Agent: Mozilla/5.0\r\n\r\n").encode('utf-8')
         
         writer.write(req)
         await writer.drain()
 
-        resp = await asyncio.wait_for(reader.read(1024), timeout=CONNECTION_TIMEOUT)
+        resp = await asyncio.wait_for(reader.read(2048), timeout=5.0)
+        writer.close()
+        await writer.wait_closed()
+
         resp_str = resp.decode('utf-8', errors='ignore')
 
-        if "HTTP/1.1 5" in resp_str or "502 Bad Gateway" in resp_str or "Error 5" in resp_str:
-            return None 
-
-        if len(resp) == 0:
-            return None 
-
-        latency = int((time.time() - start_time) * 1000)
-        if latency <= MAX_PING_MS:
-            node['ping'] = latency
-            return node
-            
+        if "<html" in resp_str.lower() or "http/1.1 200" in resp_str.lower():
+            latency = int((time.time() - start_time) * 1000)
+            if latency <= MAX_PING_MS:
+                node['ping'] = latency
+                return node
+        
         return None
     except Exception:
         return None
     finally:
         if writer is not None:
-            try:
-                writer.close()
-                await writer.wait_closed()
-            except Exception:
-                pass
+            try: writer.close()
+            except: pass
 
 async def validate_node(node, semaphore):
     async with semaphore:
