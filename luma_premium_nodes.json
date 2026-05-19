@@ -1,78 +1,38 @@
 {
+  "DE": [
+    {
+      "config": "trojan://8r%3C%5B9%27l6hAO%238ZQi@178.128.204.59:2053?security=tls&sni=Koma-YT.PAGeS.Dev&type=ws&host=Koma-YT.PAGeS.Dev&path=/trTelegram%F0%9F%87%A8%F0%9F%87%B3%2B%40WangCai2# By EbraSha 🗿",
+      "countryCode": "DE",
+      "countryName": "DE",
+      "pingMs": 1281
+    },
+    {
+      "config": "trojan://8r%3C%5B9%27l6hAO%238ZQi@178.128.203.165:2053?host=Koma-YT.PAGeS.Dev&path=/trTelegram%F0%9F%87%A8%F0%9F%87%B3+%40WangCai2&security=tls&sni=Koma-YT.PAGeS.Dev&type=ws# By EbraSha 🔐",
+      "countryCode": "DE",
+      "countryName": "DE",
+      "pingMs": 1323
+    }
+  ],
   "US": [
     {
-      "config": "trojan://8r%3C%5B9%27l6hAO%238ZQi@43.162.119.244:443?security=tls&sni=Koma-YT.PAGeS.Dev# By EbraSha 💎",
+      "config": "trojan://8r%3C%5B9%27l6hAO%238ZQi@80.93.202.253:443?sni=Koma-YT.PAGeS.Dev&peer=Koma-YT.PAGeS.Dev&security=tls# By EbraSha 🕶️",
       "countryCode": "US",
       "countryName": "US",
-      "pingMs": 1002
+      "pingMs": 1467
     },
     {
-      "config": "trojan://8r%3C%5B9%27l6hAO%238ZQi@66.103.204.102:8443?host=Koma-YT.PAGeS.Dev&path=/trTelegram%F0%9F%87%A8%F0%9F%87%B3+%40WangCai2&security=tls&sni=Koma-YT.PAGeS.Dev&type=ws# By EbraSha 💎",
+      "config": "trojan://8r%3C%5B9%27l6hAO%238ZQi@178.156.148.4:2053?security=tls&sni=Koma-YT.PAGeS.Dev&type=ws&host=Koma-YT.PAGeS.Dev&path=/trTelegram%F0%9F%87%A8%F0%9F%87%B3%2B%40WangCai2# By EbraSha 🧲",
       "countryCode": "US",
       "countryName": "US",
-      "pingMs": 1128
-    },
-    {
-      "config": "trojan://8r%3C%5B9%27l6hAO%238ZQi@38.107.232.124:2053?host=Koma-YT.PAGeS.Dev&path=/trTelegram%F0%9F%87%A8%F0%9F%87%B3+%40WangCai2&security=tls&sni=Koma-YT.PAGeS.Dev&type=ws# By EbraSha 🤖",
-      "countryCode": "US",
-      "countryName": "US",
-      "pingMs": 1208
-    },
-    {
-      "config": "trojan://8r%3C%5B9%27l6hAO%238ZQi@173.230.145.212:443?security=tls&sni=Koma-YT.PAGeS.Dev# By EbraSha 🦈",
-      "countryCode": "US",
-      "countryName": "US",
-      "pingMs": 1428
-    },
-    {
-      "config": "vless://0416d09f-a24f-46a2-a913-b0f2be57c009@151.101.33.212:443/?type=ws&encryption=none&host=aklisvpn.com&path=%2F%40aklisvpn%40aklisvpn%40aklisvpn&security=tls&sni=map.google.com&fp=chrome# By EbraSha 🕷️",
-      "countryCode": "US",
-      "countryName": "US",
-      "pingMs": 1480
+      "pingMs": 1498
     }
   ],
   "CA": [
     {
-      "config": "vmess://eyJhZGQiOiIxNzIuNjcuMTk3LjQ3IiwiYWlkIjoiMCIsImFscG4iOm51bGwsImZwIjpudWxsLCJob3N0IjpudWxsLCJpZCI6IjUxNmQ4YTdhLTNmMGItNDFkMy1iYWQwLTI0NjExNjM4MTUxNiIsIm5hbWUiOiLwn4e68J+HuCBVUyAxMzciLCJuZXQiOiJ3cyIsInBhdGgiOiIvIiwicG9ydCI6NDQzLCJwcyI6IkJ5IEVicmFTaGEg8J+bnCIsInNjeSI6ImF1dG8iLCJzbmkiOiJzeTQuNjIwNzIwLnh5eiIsInRscyI6InRscyIsInR5cGUiOm51bGwsInYiOm51bGx9",
+      "config": "vmess://eyJhZGQiOiIxNzIuNjcuMTk3LjQ3IiwiYWlkIjoiMCIsImFscG4iOm51bGwsImZwIjpudWxsLCJob3N0IjpudWxsLCJpZCI6IjUxNmQ4YTdhLTNmMGItNDFkMy1iYWQwLTI0NjExNjM4MTUxNiIsIm5hbWUiOiLwn4e68J+HuCBVUyAxMzciLCJuZXQiOiJ3cyIsInBhdGgiOiIvIiwicG9ydCI6NDQzLCJwcyI6IkJ5IEVicmFTaGEg8J+OryIsInNjeSI6ImF1dG8iLCJzbmkiOiJzeTQuNjIwNzIwLnh5eiIsInRscyI6InRscyIsInR5cGUiOm51bGwsInYiOm51bGx9",
       "countryCode": "CA",
       "countryName": "CA",
-      "pingMs": 440
-    },
-    {
-      "config": "vless://050450d4-7c7d-435f-b812-155e30fd8c7c@172.67.187.245:443?security=tls&sni=freedom1.boficax311.workers.dev&type=ws&host=freedom1.boficax311.workers.dev&path=%2F&fp=chrome# By EbraSha 📀",
-      "countryCode": "CA",
-      "countryName": "CA",
-      "pingMs": 1386
-    }
-  ],
-  "DE": [
-    {
-      "config": "trojan://8r%3C%5B9%27l6hAO%238ZQi@178.128.204.59:2053?security=tls&sni=Koma-YT.PAGeS.Dev&type=ws&host=Koma-YT.PAGeS.Dev&path=/trTelegram%F0%9F%87%A8%F0%9F%87%B3%2B%40WangCai2# By EbraSha 📀",
-      "countryCode": "DE",
-      "countryName": "DE",
-      "pingMs": 1322
-    },
-    {
-      "config": "trojan://8r%3C%5B9%27l6hAO%238ZQi@178.128.197.179:2053?security=tls&sni=Koma-YT.PAGeS.Dev&type=ws&host=Koma-YT.PAGeS.Dev&path=/trTelegram%F0%9F%87%A8%F0%9F%87%B3%2B%40WangCai2# By EbraSha 🎯",
-      "countryCode": "DE",
-      "countryName": "DE",
-      "pingMs": 1389
-    }
-  ],
-  "SG": [
-    {
-      "config": "trojan://8r%3C%5B9%27l6hAO%238ZQi@178.128.60.89:443?security=tls&sni=Koma-YT.PAGeS.Dev# By EbraSha 🗿",
-      "countryCode": "SG",
-      "countryName": "SG",
-      "pingMs": 1274
-    }
-  ],
-  "NL": [
-    {
-      "config": "trojan://8r%3C%5B9%27l6hAO%238ZQi@194.32.98.78:8443?host=Koma-YT.PAGeS.Dev&path=/trTelegram%F0%9F%87%A8%F0%9F%87%B3+%40WangCai2&security=tls&sni=Koma-YT.PAGeS.Dev&type=ws# By EbraSha 🥷",
-      "countryCode": "NL",
-      "countryName": "NL",
-      "pingMs": 1467
+      "pingMs": 424
     }
   ]
 }
