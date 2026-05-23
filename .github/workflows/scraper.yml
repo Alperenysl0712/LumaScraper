@@ -1,11 +1,11 @@
 # ==============================================================================
 # Luma Shield - Premium Node Scraper Workflow
 # ==============================================================================
-# Runs the Luma Shield Python scraper every 5 hours or manually. It installs the
-# required runtime dependency, regenerates luma_premium_nodes.json, validates the
-# JSON output, and commits the file only when the generated node list changes.
-# The workflow uses concurrency control, minimal permissions, Node 24 opt-in, and
-# a timeout to keep GitHub Actions usage efficient.
+# Runs the Luma Shield Python scraper every 5 hours or manually. It generates the
+# cloud-validated premium VPN node matrix, verifies the JSON artifact, prints a
+# short artifact summary, and commits the output only when tracked or newly
+# generated content changes. The workflow uses concurrency control, Node 24 opt-in,
+# minimal repository permissions, and a timeout to reduce unnecessary CI usage.
 # ==============================================================================
 
 name: Luma Premium Node Scraper
@@ -50,26 +50,33 @@ jobs:
       - name: Run scraper
         run: python main.py
 
-      - name: Validate output
+      - name: Inspect generated output
         run: |
+          echo "Current directory:"
+          pwd
+          echo "Repository files:"
+          ls -lah
+          echo "Checking JSON:"
           test -f luma_premium_nodes.json
+          echo "JSON size:"
+          wc -c luma_premium_nodes.json
+          echo "JSON preview:"
+          head -n 30 luma_premium_nodes.json
+
+      - name: Validate JSON
+        run: |
           python -m json.tool luma_premium_nodes.json > /tmp/luma_premium_nodes.validated.json
           mv /tmp/luma_premium_nodes.validated.json luma_premium_nodes.json
 
-      - name: Check for changes
-        id: changes
-        run: |
-          if git diff --quiet -- luma_premium_nodes.json; then
-            echo "changed=false" >> "$GITHUB_OUTPUT"
-          else
-            echo "changed=true" >> "$GITHUB_OUTPUT"
-          fi
-
       - name: Commit and push updated nodes
-        if: steps.changes.outputs.changed == 'true'
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git add luma_premium_nodes.json
+          git add -f luma_premium_nodes.json
+          git status --short
+          if git diff --cached --quiet; then
+            echo "No node changes detected."
+            exit 0
+          fi
           git commit -m "Auto-update premium VPN nodes"
           git push
