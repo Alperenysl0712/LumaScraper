@@ -1,63 +1,72 @@
 # ==============================================================================
-# Luma Shield - Cloud Proxy Scraper CI/CD Pipeline (Created by Alperen Burak Yeşil)
+# Luma Shield - Premium Node Scraper Workflow
 # ==============================================================================
-# Description:
-# This GitHub Actions workflow orchestrates the automated execution of the 
-# Luma Shield backend scraper. It ensures the mobile client receives fresh,
-# validated VPN nodes continuously without requiring manual intervention.
-#
-# Architecture & Core Methods:
-# 1. Triggers: Executes periodically via cron (every 6 hours UTC) or manually 
-#    via workflow_dispatch.
-# 2. Concurrency Control: Cancels in-progress runs to prevent git push conflicts 
-#    and save compute minutes if multiple triggers fire simultaneously.
-# 3. Environment: Provisions an ephemeral Ubuntu runner and initializes Python 3.10.
-# 4. Dependency Caching: Caches pip dependencies for faster runner initialization.
-# 5. Execution: Triggers the scraper script to ping and validate nodes.
-# 6. Artifact Persistence: Detects file changes in the JSON output. If new nodes 
-#    are found, it securely commits and pushes the updated JSON back to the repo 
-#    using the default Actions bot identity.
+# Runs the Luma Shield Python scraper on a fixed schedule and on manual demand.
+# The workflow fetches fresh proxy sources, validates high-quality VPN nodes,
+# regenerates luma_premium_nodes.json, and commits the file only when its content
+# has actually changed. It uses dependency caching, concurrency control, minimal
+# permissions, and execution time limits to keep GitHub Actions usage efficient.
 # ==============================================================================
 
 name: Luma Premium Node Scraper
 
 on:
   schedule:
-    - cron: '0 */6 * * *'
+    - cron: '0 */5 * * *'
   workflow_dispatch:
 
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
-
 concurrency:
-  group: scraper-workflow
+  group: luma-premium-node-scraper
   cancel-in-progress: true
+
+permissions:
+  contents: write
 
 jobs:
   scrape-and-update:
+    name: Scrape and Update Premium Nodes
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
+    timeout-minutes: 20
 
     steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
 
-    - name: Setup Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.10'
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
 
-    - name: Install Dependencies
-      run: pip install aiohttp
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install aiohttp
 
-    - name: Run Luma Scraper
-      run: python main.py
+      - name: Run scraper
+        run: python main.py
 
-    - name: Commit and Push Changes
-      run: |
-        git config --local user.email "github-actions[bot]@users.noreply.github.com"
-        git config --local user.name "github-actions[bot]"
-        git add luma_premium_nodes.json
-        git commit -m "Auto-update: Premium VIP nodes fetched" || exit 0
-        git push
+      - name: Validate output
+        run: |
+          python -m json.tool luma_premium_nodes.json > /tmp/luma_premium_nodes.validated.json
+          mv /tmp/luma_premium_nodes.validated.json luma_premium_nodes.json
+
+      - name: Check for changes
+        id: changes
+        run: |
+          if git diff --quiet -- luma_premium_nodes.json; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Commit and push updated nodes
+        if: steps.changes.outputs.changed == 'true'
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add luma_premium_nodes.json
+          git commit -m "Auto-update premium VPN nodes"
+          git push
