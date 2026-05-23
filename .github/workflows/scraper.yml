@@ -1,11 +1,11 @@
 # ==============================================================================
 # Luma Shield - Premium Node Scraper Workflow
 # ==============================================================================
-# Runs the Luma Shield Python scraper on a fixed schedule and on manual demand.
-# The workflow fetches fresh proxy sources, validates high-quality VPN nodes,
-# regenerates luma_premium_nodes.json, and commits the file only when its content
-# has actually changed. It uses dependency caching, concurrency control, minimal
-# permissions, and execution time limits to keep GitHub Actions usage efficient.
+# Runs the Luma Shield Python scraper every 5 hours or manually. It installs the
+# required runtime dependency, regenerates luma_premium_nodes.json, validates the
+# JSON output, and commits the file only when the generated node list changes.
+# The workflow uses concurrency control, minimal permissions, Node 24 opt-in, and
+# a timeout to keep GitHub Actions usage efficient.
 # ==============================================================================
 
 name: Luma Premium Node Scraper
@@ -14,6 +14,9 @@ on:
   schedule:
     - cron: '0 */5 * * *'
   workflow_dispatch:
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
 
 concurrency:
   group: luma-premium-node-scraper
@@ -38,7 +41,6 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-          cache: 'pip'
 
       - name: Install dependencies
         run: |
@@ -50,6 +52,7 @@ jobs:
 
       - name: Validate output
         run: |
+          test -f luma_premium_nodes.json
           python -m json.tool luma_premium_nodes.json > /tmp/luma_premium_nodes.validated.json
           mv /tmp/luma_premium_nodes.validated.json luma_premium_nodes.json
 
