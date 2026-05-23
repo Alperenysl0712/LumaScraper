@@ -2,10 +2,10 @@
 # Luma Shield - Premium Node Scraper Workflow
 # ==============================================================================
 # Runs the Luma Shield Python scraper every 5 hours or manually. It generates the
-# cloud-validated premium VPN node matrix, verifies the JSON artifact, prints a
-# short artifact summary, and commits the output only when tracked or newly
-# generated content changes. The workflow uses concurrency control, Node 24 opt-in,
-# minimal repository permissions, and a timeout to reduce unnecessary CI usage.
+# cloud-validated premium VPN node matrix, validates the JSON artifact, stages new
+# or updated output explicitly, and pushes changes with the GitHub Actions token.
+# The workflow uses concurrency control, Node 24 opt-in, minimal write permission,
+# and a timeout to keep CI execution efficient and reliable.
 # ==============================================================================
 
 name: Luma Premium Node Scraper
@@ -36,6 +36,8 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 1
+          token: ${{ secrets.GITHUB_TOKEN }}
+          persist-credentials: true
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -52,15 +54,10 @@ jobs:
 
       - name: Inspect generated output
         run: |
-          echo "Current directory:"
           pwd
-          echo "Repository files:"
           ls -lah
-          echo "Checking JSON:"
           test -f luma_premium_nodes.json
-          echo "JSON size:"
           wc -c luma_premium_nodes.json
-          echo "JSON preview:"
           head -n 30 luma_premium_nodes.json
 
       - name: Validate JSON
@@ -79,4 +76,4 @@ jobs:
             exit 0
           fi
           git commit -m "Auto-update premium VPN nodes"
-          git push
+          git push origin HEAD:${{ github.ref_name }}
