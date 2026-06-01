@@ -3,17 +3,18 @@
 Luma Shield - Cloud Proxy Scraper & Quality Node Validator
 ================================================================================
 
-Created by Alperen Burak Yeşil
+Developed by Alperen Burak Yeşil
 
 Purpose:
 Fetches VPN/Xray node configs from public repositories, deduplicates them,
 filters weak/zombie-prone configs, performs multi-attempt TLS-level probing,
-assigns a quality score, and exports the best nodes per country.
+verifies country metadata with multiple GeoIP providers, assigns a quality score,
+and exports the best nodes per country.
 
 Important:
-This version does NOT run Xray subprocess. It is a strong pre-filter, not a
-full end-to-end VPN egress validator. Flutter should still perform final
-SOCKS/generate_204 verification at connection time.
+This script does NOT run Xray subprocess. It is a strong pre-filter, not a full
+end-to-end VPN egress validator. Flutter should still perform final SOCKS /
+generate_204 / real egress verification at connection time.
 ================================================================================
 """
 
@@ -25,7 +26,8 @@ import json
 import re
 import urllib.parse
 import ssl
-from typing import Optional, Dict, Any, List
+import socket
+from typing import Optional, Dict, Any, List, Tuple
 
 
 # =============================================================================
@@ -54,8 +56,10 @@ OUTPUT_FILE = "luma_premium_nodes.json"
 CONNECTION_TIMEOUT = 5.0
 READ_TIMEOUT = 2.0
 SOURCE_TIMEOUT = 10.0
+GEO_TIMEOUT = 8.0
 
 CONCURRENCY_LIMIT = 60
+GEO_CONCURRENCY_LIMIT = 24
 LATENCY_ATTEMPTS = 3
 TOP_NODES_PER_COUNTRY = 15
 
@@ -105,13 +109,26 @@ PREFERRED_FINGERPRINTS = {
     "randomized",
 }
 
+MIN_GEO_CONFIDENCE = 0.60
+MIN_GEO_SOURCES_FOR_EXPORT = 2
+DROP_GEO_CONFLICT_NODES = False
+
+GEO_BATCH_SIZE = 80
+GEO_REQUEST_DELAY = 0.35
+
+GEO_PROVIDER_WEIGHTS = {
+    "ip_api": 1.0,
+    "ipinfo": 1.15,
+    "ipwhois": 1.0,
+}
+
 
 COUNTRY_MAPPINGS = {
-    "TR": ["🇹🇷", r"\bTR\b", r"\bTURKIYE\b", r"\.tr$"],
-    "US": ["🇺🇸", r"\bUS\b", r"\bUSA\b", r"\bUNITED STATES\b", r"\.us$"],
+    "TR": ["🇹🇷", r"\bTR\b", r"\bTURKIYE\b", r"\bTÜRKİYE\b", r"\bTURKEY\b", r"\.tr$"],
+    "US": ["🇺🇸", r"\bUS\b", r"\bUSA\b", r"\bUNITED STATES\b", r"\bAMERICA\b", r"\.us$"],
     "DE": ["🇩🇪", r"\bDE\b", r"\bGERMANY\b", r"\bDEUTSCHLAND\b", r"\.de$"],
     "FR": ["🇫🇷", r"\bFR\b", r"\bFRANCE\b", r"\.fr$"],
-    "GB": ["🇬🇧", r"\bGB\b", r"\bUK\b", r"\bENGLAND\b", r"\bUNITED KINGDOM\b", r"\.uk$"],
+    "GB": ["🇬🇧", r"\bGB\b", r"\bUK\b", r"\bENGLAND\b", r"\bUNITED KINGDOM\b", r"\bBRITAIN\b", r"\.uk$"],
     "NL": ["🇳🇱", r"\bNL\b", r"\bNETHERLANDS\b", r"\bHOLLAND\b", r"\.nl$"],
     "SG": ["🇸🇬", r"\bSG\b", r"\bSINGAPORE\b", r"\.sg$"],
     "JP": ["🇯🇵", r"\bJP\b", r"\bJAPAN\b", r"\.jp$"],
@@ -119,6 +136,61 @@ COUNTRY_MAPPINGS = {
     "AU": ["🇦🇺", r"\bAU\b", r"\bAUSTRALIA\b", r"\.au$"],
     "IT": ["🇮🇹", r"\bIT\b", r"\bITALY\b", r"\.it$"],
     "ES": ["🇪🇸", r"\bES\b", r"\bSPAIN\b", r"\.es$"],
+    "PL": ["🇵🇱", r"\bPL\b", r"\bPOLAND\b", r"\.pl$"],
+    "CZ": ["🇨🇿", r"\bCZ\b", r"\bCZECH\b", r"\bCZECHIA\b", r"\.cz$"],
+    "AT": ["🇦🇹", r"\bAT\b", r"\bAUSTRIA\b", r"\.at$"],
+    "CH": ["🇨🇭", r"\bCH\b", r"\bSWITZERLAND\b", r"\.ch$"],
+    "SE": ["🇸🇪", r"\bSE\b", r"\bSWEDEN\b", r"\.se$"],
+    "NO": ["🇳🇴", r"\bNO\b", r"\bNORWAY\b", r"\.no$"],
+    "FI": ["🇫🇮", r"\bFI\b", r"\bFINLAND\b", r"\.fi$"],
+    "DK": ["🇩🇰", r"\bDK\b", r"\bDENMARK\b", r"\.dk$"],
+    "BE": ["🇧🇪", r"\bBE\b", r"\bBELGIUM\b", r"\.be$"],
+    "IE": ["🇮🇪", r"\bIE\b", r"\bIRELAND\b", r"\.ie$"],
+    "RO": ["🇷🇴", r"\bRO\b", r"\bROMANIA\b", r"\.ro$"],
+    "BG": ["🇧🇬", r"\bBG\b", r"\bBULGARIA\b", r"\.bg$"],
+    "HU": ["🇭🇺", r"\bHU\b", r"\bHUNGARY\b", r"\.hu$"],
+    "RU": ["🇷🇺", r"\bRU\b", r"\bRUSSIA\b", r"\.ru$"],
+    "UA": ["🇺🇦", r"\bUA\b", r"\bUKRAINE\b", r"\.ua$"],
+}
+
+
+COUNTRY_NAMES = {
+    "TR": "Türkiye",
+    "US": "Amerika",
+    "DE": "Almanya",
+    "FR": "Fransa",
+    "GB": "İngiltere",
+    "NL": "Hollanda",
+    "SG": "Singapur",
+    "JP": "Japonya",
+    "CA": "Kanada",
+    "AU": "Avustralya",
+    "IT": "İtalya",
+    "ES": "İspanya",
+    "PL": "Polonya",
+    "CZ": "Çekya",
+    "AT": "Avusturya",
+    "CH": "İsviçre",
+    "SE": "İsveç",
+    "NO": "Norveç",
+    "FI": "Finlandiya",
+    "DK": "Danimarka",
+    "BE": "Belçika",
+    "IE": "İrlanda",
+    "RO": "Romanya",
+    "BG": "Bulgaristan",
+    "HU": "Macaristan",
+    "RU": "Rusya",
+    "UA": "Ukrayna",
+    "BR": "Brezilya",
+    "AR": "Arjantin",
+    "MX": "Meksika",
+    "ZA": "Güney Afrika",
+    "AE": "B.A.E.",
+    "IN": "Hindistan",
+    "KR": "Güney Kore",
+    "HK": "Hong Kong",
+    "TW": "Tayvan",
 }
 
 
@@ -130,6 +202,7 @@ def decode_base64(data: str) -> str:
     try:
         clean = data.strip()
         clean = clean.replace("\n", "").replace("\r", "")
+        clean = clean.replace("-", "+").replace("_", "/")
         missing_padding = len(clean) % 4
         if missing_padding:
             clean += "=" * (4 - missing_padding)
@@ -138,13 +211,68 @@ def decode_base64(data: str) -> str:
         return data
 
 
+def normalize_country_code(value: str) -> str:
+    code = (value or "").strip().upper()
+
+    if code == "UK":
+        return "GB"
+
+    if len(code) != 2:
+        return ""
+
+    if not re.match(r"^[A-Z]{2}$", code):
+        return ""
+
+    return code
+
+
+def country_name(code: str) -> str:
+    normalized = normalize_country_code(code)
+    return COUNTRY_NAMES.get(normalized, normalized or "UN")
+
+
 def is_ipv4(value: str) -> bool:
-    return re.match(r"^\d{1,3}(\.\d{1,3}){3}$", value or "") is not None
+    if not re.match(r"^\d{1,3}(\.\d{1,3}){3}$", value or ""):
+        return False
+
+    try:
+        parts = [int(part) for part in value.split(".")]
+        return all(0 <= part <= 255 for part in parts)
+    except Exception:
+        return False
+
+
+def is_private_ip(value: str) -> bool:
+    if not is_ipv4(value):
+        return False
+
+    try:
+        parts = [int(part) for part in value.split(".")]
+        a, b = parts[0], parts[1]
+
+        if a == 10:
+            return True
+        if a == 127:
+            return True
+        if a == 169 and b == 254:
+            return True
+        if a == 172 and 16 <= b <= 31:
+            return True
+        if a == 192 and b == 168:
+            return True
+        if a == 100 and 64 <= b <= 127:
+            return True
+
+        return False
+    except Exception:
+        return True
 
 
 def is_valid_hostname(value: str) -> bool:
     if not value:
         return False
+
+    value = value.strip().strip("[]")
 
     if is_ipv4(value):
         return False
@@ -155,6 +283,9 @@ def is_valid_hostname(value: str) -> bool:
     try:
         value.encode("idna")
     except Exception:
+        return False
+
+    if "." not in value:
         return False
 
     return re.match(r"^[a-zA-Z0-9.-]+$", value) is not None
@@ -170,16 +301,27 @@ def safe_unquote(value: str) -> str:
 def extract_query_value(link: str, key: str, default: str = "") -> str:
     try:
         uri = urllib.parse.urlparse(link)
-        q = urllib.parse.parse_qs(uri.query)
+        q = urllib.parse.parse_qs(uri.query, keep_blank_values=True)
         return q.get(key, [default])[0] or default
     except Exception:
         return default
 
 
 def get_transport(link: str) -> str:
-    value = extract_query_value(link, "type", "tcp").lower()
+    value = extract_query_value(link, "type", "").lower()
+
+    if not value:
+        value = extract_query_value(link, "transport", "").lower()
+
+    if not value:
+        value = extract_query_value(link, "net", "").lower()
+
     if not value:
         value = "tcp"
+
+    if value == "websocket":
+        return "ws"
+
     return value
 
 
@@ -195,13 +337,34 @@ def get_uuid_from_link(link: str) -> str:
         return ""
 
 
-def predict_true_egress(remark: str, sni: str, host: str, ip: str) -> Optional[str]:
+def safe_host_from_link(link: str) -> str:
+    try:
+        uri = urllib.parse.urlparse(link)
+        return (uri.hostname or "").strip()
+    except Exception:
+        match = re.search(r"@([^:/?#]+):", link)
+        return match.group(1).strip() if match else ""
+
+
+def safe_port_from_link(link: str) -> int:
+    try:
+        uri = urllib.parse.urlparse(link)
+        return int(uri.port or 443)
+    except Exception:
+        match = re.search(r"@[^:/?#]+:(\d{2,5})", link)
+        return int(match.group(1)) if match else 443
+
+
+def predict_country_from_metadata(remark: str, sni: str, host: str, ip: str) -> Optional[str]:
     space = f"{remark} {sni} {host} {ip}".upper()
 
     for code, patterns in COUNTRY_MAPPINGS.items():
         for pattern in patterns:
             try:
-                if re.search(pattern, space):
+                if pattern.startswith("🇦") or pattern.startswith("🇧") or pattern.startswith("🇨") or pattern.startswith("🇩") or pattern.startswith("🇪") or pattern.startswith("🇫") or pattern.startswith("🇬") or pattern.startswith("🇭") or pattern.startswith("🇮") or pattern.startswith("🇯") or pattern.startswith("🇳") or pattern.startswith("🇵") or pattern.startswith("🇷") or pattern.startswith("🇸") or pattern.startswith("🇹") or pattern.startswith("🇺"):
+                    if pattern in f"{remark} {sni} {host} {ip}":
+                        return code
+                elif re.search(pattern, space):
                     return code
             except Exception:
                 pass
@@ -210,9 +373,6 @@ def predict_true_egress(remark: str, sni: str, host: str, ip: str) -> Optional[s
 
 
 def normalize_vless_link(link: str) -> str:
-    """
-    Adds safe defaults without aggressively rewriting the protocol.
-    """
     lower = link.lower()
 
     if "fragment=" not in lower:
@@ -224,6 +384,7 @@ def normalize_vless_link(link: str) -> str:
 
 def node_fingerprint(node: Dict[str, Any]) -> str:
     link = node["link"]
+
     proto = node.get("proto", "")
     ip = node.get("ip", "")
     port = node.get("port", "")
@@ -235,9 +396,36 @@ def node_fingerprint(node: Dict[str, Any]) -> str:
     sid = extract_query_value(link, "sid")
     flow = extract_query_value(link, "flow")
     security = extract_query_value(link, "security")
-    transport = extract_query_value(link, "type", "tcp")
+    transport = get_transport(link)
+    fp = extract_query_value(link, "fp")
 
-    return f"{proto}|{ip}|{port}|{uuid}|{sni}|{host}|{pbk}|{sid}|{flow}|{security}|{transport}"
+    return f"{proto}|{ip}|{port}|{uuid}|{sni}|{host}|{pbk}|{sid}|{flow}|{security}|{transport}|{fp}"
+
+
+def extract_links_from_text(text: str) -> List[str]:
+    lines: List[str] = []
+
+    for raw in text.splitlines():
+        line = raw.strip()
+        if not line:
+            continue
+
+        if "://" in line:
+            lines.append(line)
+            continue
+
+        decoded = decode_base64(line)
+        if decoded != line and "://" in decoded:
+            for decoded_line in decoded.splitlines():
+                decoded_line = decoded_line.strip()
+                if "://" in decoded_line:
+                    lines.append(decoded_line)
+
+    if not lines and "://" in text:
+        pattern = re.compile(r"(vless|vmess|trojan|ss|hysteria2|hy2)://[^\s]+", re.IGNORECASE)
+        lines.extend(match.group(0).strip() for match in pattern.finditer(text))
+
+    return lines
 
 
 # =============================================================================
@@ -247,6 +435,7 @@ def node_fingerprint(node: Dict[str, Any]) -> str:
 def parse_config(link: str) -> Optional[Dict[str, Any]]:
     try:
         link = link.strip()
+
         if not link or "://" not in link:
             return None
 
@@ -259,15 +448,16 @@ def parse_config(link: str) -> Optional[Dict[str, Any]]:
             return None
 
         if proto in ["hysteria2", "hy2"]:
-            # HY2 needs separate UDP-based validation. Do not trust it here.
             return None
 
-        match = re.search(r"@([^:/?#]+):(\d+)", link)
-        if not match:
+        ip = safe_host_from_link(link)
+        port = safe_port_from_link(link)
+
+        if not ip:
             return None
 
-        ip = match.group(1).strip()
-        port = int(match.group(2))
+        if is_private_ip(ip):
+            return None
 
         if port not in ALLOWED_VLESS_PORTS:
             return None
@@ -303,12 +493,15 @@ def parse_config(link: str) -> Optional[Dict[str, Any]]:
 
         if security in ["reality", "tls"]:
             if not sni and not host:
-                # Some configs can still work without SNI, but quality is usually worse.
+                return None
+
+        if sni and not is_valid_hostname(sni):
+            if security == "reality":
                 return None
 
         link = normalize_vless_link(link)
 
-        country = predict_true_egress(remark, sni, host, ip)
+        predicted_country = predict_country_from_metadata(remark, sni, host, ip)
 
         return {
             "link": link,
@@ -323,12 +516,253 @@ def parse_config(link: str) -> Optional[Dict[str, Any]]:
             "fp": fp,
             "pbk": pbk,
             "sid": sid,
-            "country": country,
+            "country": predicted_country,
+            "predictedCountry": predicted_country,
             "remark": remark,
         }
 
     except Exception:
         return None
+
+
+# =============================================================================
+# GEO CONSENSUS
+# =============================================================================
+
+def weighted_country_consensus(results: Dict[str, str]) -> Dict[str, Any]:
+    votes: Dict[str, float] = {}
+    sources: Dict[str, List[str]] = {}
+
+    for provider, country in results.items():
+        code = normalize_country_code(country)
+        if not code:
+            continue
+
+        weight = float(GEO_PROVIDER_WEIGHTS.get(provider, 1.0))
+        votes[code] = votes.get(code, 0.0) + weight
+        sources.setdefault(code, []).append(provider)
+
+    if not votes:
+        return {
+            "country": "UN",
+            "confidence": 0.0,
+            "sources": [],
+            "raw": results,
+            "conflict": False,
+        }
+
+    total = sum(votes.values())
+    country, score = sorted(votes.items(), key=lambda item: item[1], reverse=True)[0]
+
+    confidence = score / total if total > 0 else 0.0
+
+    return {
+        "country": country,
+        "confidence": round(confidence, 3),
+        "sources": sources.get(country, []),
+        "raw": results,
+        "conflict": len(votes) > 1,
+    }
+
+
+async def fetch_ip_api_batch(
+    session: aiohttp.ClientSession,
+    ips: List[str],
+) -> Dict[str, str]:
+    result: Dict[str, str] = {}
+
+    try:
+        async with session.post(
+            "http://ip-api.com/batch?fields=query,countryCode,status",
+            json=ips,
+        ) as resp:
+            if resp.status != 200:
+                return result
+
+            data = await resp.json(content_type=None)
+
+            if not isinstance(data, list):
+                return result
+
+            for item in data:
+                if not isinstance(item, dict):
+                    continue
+
+                if item.get("status") != "success":
+                    continue
+
+                ip = item.get("query")
+                country = normalize_country_code(item.get("countryCode", ""))
+
+                if ip and country:
+                    result[ip] = country
+
+    except Exception:
+        pass
+
+    return result
+
+
+async def fetch_ipinfo_country(
+    session: aiohttp.ClientSession,
+    ip: str,
+    semaphore: asyncio.Semaphore,
+) -> Tuple[str, Optional[str]]:
+    async with semaphore:
+        try:
+            async with session.get(f"https://ipinfo.io/{ip}/json") as resp:
+                if resp.status != 200:
+                    return ip, None
+
+                data = await resp.json(content_type=None)
+                return ip, normalize_country_code(data.get("country", ""))
+
+        except Exception:
+            return ip, None
+
+
+async def fetch_ipwhois_country(
+    session: aiohttp.ClientSession,
+    ip: str,
+    semaphore: asyncio.Semaphore,
+) -> Tuple[str, Optional[str]]:
+    async with semaphore:
+        try:
+            async with session.get(f"https://ipwho.is/{ip}") as resp:
+                if resp.status != 200:
+                    return ip, None
+
+                data = await resp.json(content_type=None)
+
+                if isinstance(data, dict) and data.get("success") is False:
+                    return ip, None
+
+                return ip, normalize_country_code(data.get("country_code", ""))
+
+        except Exception:
+            return ip, None
+
+
+async def resolve_geo_consensus(nodes: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    if not nodes:
+        return nodes
+
+    ips = sorted(set(n["ip"] for n in nodes if n.get("ip")))
+
+    print("===============================================================")
+    print("[LUMA] Running multi-provider GeoIP consensus...")
+    print("===============================================================")
+    print(f"[LUMA] Unique IPs for GeoIP: {len(ips)}")
+
+    timeout = aiohttp.ClientTimeout(total=GEO_TIMEOUT)
+    headers = {
+        "User-Agent": "Mozilla/5.0 LumaShieldGeoValidator/2.1",
+        "Accept": "application/json,*/*",
+    }
+
+    ip_api_map: Dict[str, str] = {}
+    ipinfo_map: Dict[str, str] = {}
+    ipwhois_map: Dict[str, str] = {}
+
+    geo_semaphore = asyncio.Semaphore(GEO_CONCURRENCY_LIMIT)
+
+    async with aiohttp.ClientSession(timeout=timeout, headers=headers) as session:
+        for i in range(0, len(ips), GEO_BATCH_SIZE):
+            batch = ips[i:i + GEO_BATCH_SIZE]
+            batch_result = await fetch_ip_api_batch(session, batch)
+            ip_api_map.update(batch_result)
+            await asyncio.sleep(GEO_REQUEST_DELAY)
+
+        ipinfo_tasks = [fetch_ipinfo_country(session, ip, geo_semaphore) for ip in ips]
+        ipwhois_tasks = [fetch_ipwhois_country(session, ip, geo_semaphore) for ip in ips]
+
+        ipinfo_results = await asyncio.gather(*ipinfo_tasks, return_exceptions=True)
+        ipwhois_results = await asyncio.gather(*ipwhois_tasks, return_exceptions=True)
+
+    for item in ipinfo_results:
+        if isinstance(item, tuple):
+            ip, country = item
+            if country:
+                ipinfo_map[ip] = country
+
+    for item in ipwhois_results:
+        if isinstance(item, tuple):
+            ip, country = item
+            if country:
+                ipwhois_map[ip] = country
+
+    consensus_by_ip: Dict[str, Dict[str, Any]] = {}
+
+    for ip in ips:
+        raw = {
+            "ip_api": ip_api_map.get(ip, ""),
+            "ipinfo": ipinfo_map.get(ip, ""),
+            "ipwhois": ipwhois_map.get(ip, ""),
+        }
+
+        consensus_by_ip[ip] = weighted_country_consensus(raw)
+
+    patched: List[Dict[str, Any]] = []
+
+    mismatch_count = 0
+    conflict_count = 0
+    weak_geo_count = 0
+
+    for node in nodes:
+        ip = node.get("ip", "")
+        geo = consensus_by_ip.get(ip, {
+            "country": "UN",
+            "confidence": 0.0,
+            "sources": [],
+            "raw": {},
+            "conflict": False,
+        })
+
+        predicted = normalize_country_code(node.get("predictedCountry") or node.get("country") or "")
+        observed = normalize_country_code(geo.get("country", "")) or "UN"
+
+        sources = geo.get("sources", [])
+        confidence = float(geo.get("confidence", 0.0))
+        conflict = bool(geo.get("conflict", False))
+
+        country_mismatch = (
+            bool(predicted)
+            and observed != "UN"
+            and predicted != observed
+        )
+
+        if country_mismatch:
+            mismatch_count += 1
+
+        if conflict:
+            conflict_count += 1
+
+        if confidence < MIN_GEO_CONFIDENCE or len(sources) < MIN_GEO_SOURCES_FOR_EXPORT:
+            weak_geo_count += 1
+
+        node["predictedCountryCode"] = predicted or ""
+        node["observedCountryCode"] = observed
+        node["observedIp"] = ip
+        node["geoConfidence"] = round(confidence, 3)
+        node["geoSources"] = sources
+        node["geoRaw"] = geo.get("raw", {})
+        node["geoConflict"] = conflict
+        node["countryMismatch"] = country_mismatch
+
+        if observed != "UN":
+            node["country"] = observed
+        elif predicted:
+            node["country"] = predicted
+        else:
+            node["country"] = "UN"
+
+        patched.append(node)
+
+    print(f"[LUMA] Geo conflicts: {conflict_count}")
+    print(f"[LUMA] Predicted/observed mismatches: {mismatch_count}")
+    print(f"[LUMA] Weak GeoIP confidence nodes: {weak_geo_count}")
+
+    return patched
 
 
 # =============================================================================
@@ -340,7 +774,6 @@ def compute_quality_score(node: Dict[str, Any]) -> float:
     jitter = int(node.get("jitter", 9999))
     success_rate = float(node.get("probeSuccessRate", 0.0))
 
-    link = node.get("link", "").lower()
     port = int(node.get("port", 0))
     security = node.get("security", "")
     transport = node.get("transport", "")
@@ -348,9 +781,13 @@ def compute_quality_score(node: Dict[str, Any]) -> float:
     fp = node.get("fp", "")
     sni = node.get("sni", "")
 
+    geo_confidence = float(node.get("geoConfidence", 0.0))
+    geo_sources = node.get("geoSources", [])
+    geo_conflict = bool(node.get("geoConflict", False))
+    country_mismatch = bool(node.get("countryMismatch", False))
+
     score = 100.0
 
-    # Ping penalty
     if ping > 1500:
         score -= 50
     elif ping > 1200:
@@ -364,7 +801,6 @@ def compute_quality_score(node: Dict[str, Any]) -> float:
     elif ping < 250:
         score += 5
 
-    # Jitter penalty
     if jitter > 1000:
         score -= 35
     elif jitter > 800:
@@ -376,7 +812,6 @@ def compute_quality_score(node: Dict[str, Any]) -> float:
     elif jitter < 120:
         score += 5
 
-    # Probe stability
     if success_rate >= 1.0:
         score += 12
     elif success_rate >= 0.67:
@@ -384,7 +819,6 @@ def compute_quality_score(node: Dict[str, Any]) -> float:
     else:
         score -= 35
 
-    # Security
     if security == "reality":
         score += 14
     elif security == "tls":
@@ -392,7 +826,6 @@ def compute_quality_score(node: Dict[str, Any]) -> float:
     else:
         score -= 45
 
-    # Transport
     if transport == "tcp":
         score += 6
     elif transport == "grpc":
@@ -402,11 +835,9 @@ def compute_quality_score(node: Dict[str, Any]) -> float:
     elif transport in BLOCKED_TRANSPORTS:
         score -= 45
 
-    # XTLS Vision
     if flow == "xtls-rprx-vision":
         score += 8
 
-    # Port quality
     if port == 443:
         score += 8
     elif port in [8443, 2053, 2083, 2087, 2096]:
@@ -414,17 +845,29 @@ def compute_quality_score(node: Dict[str, Any]) -> float:
     else:
         score -= 25
 
-    # Fingerprint
     if fp in ["chrome", "firefox", "safari", "ios", "android", "randomized"]:
         score += 4
 
-    # SNI
     if sni and is_valid_hostname(sni):
         score += 5
     else:
         score -= 18
 
-    # Bad markers
+    if geo_confidence >= 0.95 and len(geo_sources) >= 2:
+        score += 8
+    elif geo_confidence >= 0.60 and len(geo_sources) >= 2:
+        score += 3
+    elif geo_confidence > 0:
+        score -= 6
+    else:
+        score -= 16
+
+    if geo_conflict:
+        score -= 8
+
+    if country_mismatch:
+        score -= 10
+
     bad_markers = [
         "test",
         "expire",
@@ -438,6 +881,7 @@ def compute_quality_score(node: Dict[str, Any]) -> float:
     ]
 
     remark = node.get("remark", "").lower()
+
     for marker in bad_markers:
         if marker in remark:
             score -= 5
@@ -446,7 +890,7 @@ def compute_quality_score(node: Dict[str, Any]) -> float:
 
 
 # =============================================================================
-# PROBING
+# TLS PROBING
 # =============================================================================
 
 async def single_tls_probe(node: Dict[str, Any]) -> Optional[int]:
@@ -479,7 +923,7 @@ async def single_tls_probe(node: Dict[str, Any]) -> Optional[int]:
         request = (
             "HEAD / HTTP/1.1\r\n"
             f"Host: {host_header}\r\n"
-            "User-Agent: Mozilla/5.0\r\n"
+            "User-Agent: Mozilla/5.0 LumaShieldScanner/2.1\r\n"
             "Accept: */*\r\n"
             "Connection: close\r\n\r\n"
         ).encode("utf-8", errors="ignore")
@@ -494,7 +938,6 @@ async def single_tls_probe(node: Dict[str, Any]) -> Optional[int]:
 
         elapsed_ms = int((time.time() - start) * 1000)
 
-        # Do not require 200. Any coherent TLS-level response is enough for stage-1.
         if (
             b"HTTP/" in response
             or b"400" in response
@@ -530,6 +973,7 @@ async def validate_node(node: Dict[str, Any], semaphore: asyncio.Semaphore) -> O
                 ms = await single_tls_probe(node)
                 if ms is not None:
                     values.append(ms)
+
                 await asyncio.sleep(0.12)
 
             if not values:
@@ -545,7 +989,6 @@ async def validate_node(node: Dict[str, Any], semaphore: asyncio.Semaphore) -> O
             node["jitter"] = jitter
             node["probeSuccessRate"] = round(success_rate, 2)
             node["verifiedAt"] = int(time.time())
-            node["qualityScore"] = compute_quality_score(node)
 
             if node["ping"] > MAX_ACCEPTED_PING:
                 return None
@@ -556,53 +999,10 @@ async def validate_node(node: Dict[str, Any], semaphore: asyncio.Semaphore) -> O
             if node["probeSuccessRate"] < MIN_PROBE_SUCCESS_RATE:
                 return None
 
-            if node["qualityScore"] < MIN_QUALITY_SCORE:
-                return None
-
             return node
 
         except Exception:
             return None
-
-
-# =============================================================================
-# COUNTRY FALLBACK
-# =============================================================================
-
-async def resolve_fallback_countries(nodes: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-    unknown = [n for n in nodes if n.get("country") is None]
-    if not unknown:
-        return nodes
-
-    ips = list(set([n["ip"] for n in unknown if n.get("ip")]))
-    ip_to_country: Dict[str, str] = {}
-
-    timeout = aiohttp.ClientTimeout(total=8)
-
-    async with aiohttp.ClientSession(timeout=timeout) as session:
-        for i in range(0, len(ips), 100):
-            batch = ips[i:i + 100]
-
-            try:
-                async with session.post(
-                    "http://ip-api.com/batch?fields=query,countryCode,status",
-                    json=batch,
-                ) as resp:
-                    if resp.status == 200:
-                        data = await resp.json(content_type=None)
-                        for item in data:
-                            if item.get("status") == "success":
-                                ip_to_country[item["query"]] = item.get("countryCode", "UN")
-            except Exception:
-                pass
-
-            await asyncio.sleep(0.25)
-
-    for node in nodes:
-        if node.get("country") is None:
-            node["country"] = ip_to_country.get(node.get("ip"), "UN")
-
-    return nodes
 
 
 # =============================================================================
@@ -613,30 +1013,20 @@ async def fetch_source(session: aiohttp.ClientSession, url: str) -> List[str]:
     try:
         async with session.get(url) as response:
             if response.status != 200:
+                print(f"[LUMA] Source skipped status={response.status}: {url}")
                 return []
 
             text = await response.text(errors="ignore")
 
             if "://" not in text:
-                text = decode_base64(text)
+                decoded = decode_base64(text)
+                if "://" in decoded:
+                    text = decoded
 
-            lines = []
-            for line in text.splitlines():
-                line = line.strip()
-                if not line:
-                    continue
+            return extract_links_from_text(text)
 
-                if "://" not in line:
-                    maybe = decode_base64(line)
-                    if "://" in maybe:
-                        lines.extend(maybe.splitlines())
-                    continue
-
-                lines.append(line)
-
-            return lines
-
-    except Exception:
+    except Exception as e:
+        print(f"[LUMA] Source error: {url} | {e}")
         return []
 
 
@@ -644,8 +1034,10 @@ async def fetch_all_links() -> List[str]:
     timeout = aiohttp.ClientTimeout(total=SOURCE_TIMEOUT)
 
     headers = {
-        "User-Agent": "Mozilla/5.0 LumaShieldNodeScanner/1.0",
+        "User-Agent": "Mozilla/5.0 LumaShieldNodeScanner/2.1",
         "Accept": "*/*",
+        "Cache-Control": "no-cache",
+        "Pragma": "no-cache",
     }
 
     async with aiohttp.ClientSession(timeout=timeout, headers=headers) as session:
@@ -659,6 +1051,68 @@ async def fetch_all_links() -> List[str]:
             raw_links.extend(result)
 
     return raw_links
+
+
+# =============================================================================
+# EXPORT FILTERING
+# =============================================================================
+
+def should_export_node(node: Dict[str, Any]) -> bool:
+    if node.get("country") in ["", None, "UN"]:
+        return False
+
+    if float(node.get("qualityScore", 0.0)) < MIN_QUALITY_SCORE:
+        return False
+
+    if int(node.get("ping", 9999)) > MAX_ACCEPTED_PING:
+        return False
+
+    if int(node.get("jitter", 9999)) > MAX_ACCEPTED_JITTER:
+        return False
+
+    if float(node.get("probeSuccessRate", 0.0)) < MIN_PROBE_SUCCESS_RATE:
+        return False
+
+    geo_confidence = float(node.get("geoConfidence", 0.0))
+    geo_sources = node.get("geoSources", [])
+
+    if geo_confidence < MIN_GEO_CONFIDENCE:
+        return False
+
+    if len(geo_sources) < MIN_GEO_SOURCES_FOR_EXPORT:
+        return False
+
+    if DROP_GEO_CONFLICT_NODES and node.get("countryMismatch") is True:
+        return False
+
+    return True
+
+
+def export_node_payload(node: Dict[str, Any], country: str) -> Dict[str, Any]:
+    return {
+        "config": node["link"],
+        "countryCode": country,
+        "countryName": country_name(country),
+        "pingMs": int(node["ping"]),
+        "qualityScore": float(node.get("qualityScore", 0)),
+        "jitterMs": int(node.get("jitter", 9999)),
+        "probeSuccessRate": float(node.get("probeSuccessRate", 0)),
+        "proto": node.get("proto", ""),
+        "security": node.get("security", ""),
+        "transport": node.get("transport", ""),
+        "flow": node.get("flow", ""),
+        "fp": node.get("fp", ""),
+        "verifiedAt": int(node.get("verifiedAt", int(time.time()))),
+        "host": node.get("ip", ""),
+        "port": int(node.get("port", 443)),
+        "observedIp": node.get("observedIp", node.get("ip", "")),
+        "observedCountryCode": node.get("observedCountryCode", country),
+        "predictedCountryCode": node.get("predictedCountryCode", ""),
+        "geoConfidence": float(node.get("geoConfidence", 0.0)),
+        "geoSources": node.get("geoSources", []),
+        "geoConflict": bool(node.get("geoConflict", False)),
+        "countryMismatch": bool(node.get("countryMismatch", False)),
+    }
 
 
 # =============================================================================
@@ -696,11 +1150,12 @@ async def main():
     if not parsed_nodes:
         with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
             json.dump({}, f, ensure_ascii=False, indent=2)
+
         print("[LUMA] No candidates found. Empty JSON exported.")
         return
 
     print("===============================================================")
-    print("[LUMA] Running multi-probe quality validation...")
+    print("[LUMA] Running multi-probe TLS quality validation...")
     print("===============================================================")
 
     semaphore = asyncio.Semaphore(CONCURRENCY_LIMIT)
@@ -713,16 +1168,30 @@ async def main():
         if isinstance(result, dict)
     ]
 
-    print(f"[LUMA] Alive high-quality candidates: {len(alive)}")
+    print(f"[LUMA] Alive high-quality pre-geo candidates: {len(alive)}")
 
-    alive = await resolve_fallback_countries(alive)
+    if not alive:
+        with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
+            json.dump({}, f, ensure_ascii=False, indent=2)
+
+        print("[LUMA] No alive candidates found. Empty JSON exported.")
+        return
+
+    alive = await resolve_geo_consensus(alive)
+
+    for node in alive:
+        node["qualityScore"] = compute_quality_score(node)
+
+    filtered_alive = [node for node in alive if should_export_node(node)]
+
+    print(f"[LUMA] Exportable nodes after geo consensus: {len(filtered_alive)}")
 
     pools: Dict[str, List[Dict[str, Any]]] = {}
 
-    for node in alive:
-        country = node.get("country")
+    for node in filtered_alive:
+        country = normalize_country_code(node.get("country", ""))
 
-        if not country or country not in COUNTRY_MAPPINGS:
+        if not country or country == "UN":
             continue
 
         pools.setdefault(country, []).append(node)
@@ -730,47 +1199,21 @@ async def main():
     out: Dict[str, List[Dict[str, Any]]] = {}
 
     for country, nodes in pools.items():
-        filtered = [
-            n for n in nodes
-            if n.get("qualityScore", 0) >= MIN_QUALITY_SCORE
-            and n.get("ping", 9999) <= MAX_ACCEPTED_PING
-            and n.get("jitter", 9999) <= MAX_ACCEPTED_JITTER
-            and n.get("probeSuccessRate", 0) >= MIN_PROBE_SUCCESS_RATE
-        ]
-
-        filtered.sort(
+        nodes.sort(
             key=lambda x: (
                 -float(x.get("qualityScore", 0)),
                 int(x.get("ping", 9999)),
                 int(x.get("jitter", 9999)),
+                -float(x.get("geoConfidence", 0)),
             )
         )
 
-        selected = filtered[:TOP_NODES_PER_COUNTRY]
+        selected = nodes[:TOP_NODES_PER_COUNTRY]
 
         if not selected:
             continue
 
-        out[country] = [
-            {
-                "config": n["link"],
-                "countryCode": country,
-                "countryName": country,
-                "pingMs": int(n["ping"]),
-
-                # Extra quality metadata for Flutter AI / ranking
-                "qualityScore": float(n.get("qualityScore", 0)),
-                "jitterMs": int(n.get("jitter", 9999)),
-                "probeSuccessRate": float(n.get("probeSuccessRate", 0)),
-                "proto": n.get("proto", ""),
-                "security": n.get("security", ""),
-                "transport": n.get("transport", ""),
-                "flow": n.get("flow", ""),
-                "fp": n.get("fp", ""),
-                "verifiedAt": int(n.get("verifiedAt", int(time.time()))),
-            }
-            for n in selected
-        ]
+        out[country] = [export_node_payload(node, country) for node in selected]
 
     with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
         json.dump(out, f, ensure_ascii=False, indent=2)
@@ -789,10 +1232,17 @@ async def main():
         best = items[0]
         print(
             f"[LUMA] {country}: {len(items)} nodes | "
-            f"best ping={best['pingMs']}ms | "
-            f"quality={best['qualityScore']}"
+            f"best={best['host']}:{best['port']} | "
+            f"ping={best['pingMs']}ms | "
+            f"quality={best['qualityScore']} | "
+            f"geo={best['observedCountryCode']} "
+            f"conf={best['geoConfidence']} "
+            f"sources={','.join(best['geoSources'])}"
         )
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    try:
+        asyncio.run(main())
+    except KeyboardInterrupt:
+        print("\n[LUMA] Interrupted by user.")
