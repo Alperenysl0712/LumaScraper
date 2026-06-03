@@ -4,8 +4,6 @@
 # Runs the Luma Shield Python scraper every 5 hours or manually. It generates the
 # cloud-validated premium VPN node matrix, validates the JSON artifact, stages new
 # or updated output explicitly, and pushes changes with the GitHub Actions token.
-# The workflow uses concurrency control, Node 24 opt-in, minimal write permission,
-# and a timeout to keep CI execution efficient and reliable.
 # ==============================================================================
 
 name: Luma Premium Node Scraper
@@ -17,10 +15,12 @@ on:
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
+  PYTHONUNBUFFERED: '1'
+  PIP_DISABLE_PIP_VERSION_CHECK: '1'
 
 concurrency:
   group: luma-premium-node-scraper
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 permissions:
   contents: write
@@ -29,7 +29,7 @@ jobs:
   scrape-and-update:
     name: Scrape and Update Premium Nodes
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 45
 
     steps:
       - name: Checkout repository
@@ -43,6 +43,7 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+          cache: 'pip'
 
       - name: Install dependencies
         run: |
@@ -50,7 +51,11 @@ jobs:
           pip install aiohttp
 
       - name: Run scraper
-        run: python main.py
+        timeout-minutes: 38
+        run: |
+          echo "Scraper started at: $(date -u)"
+          python main.py
+          echo "Scraper finished at: $(date -u)"
 
       - name: Inspect generated output
         run: |
@@ -65,15 +70,41 @@ jobs:
           python -m json.tool luma_premium_nodes.json > /tmp/luma_premium_nodes.validated.json
           mv /tmp/luma_premium_nodes.validated.json luma_premium_nodes.json
 
+      - name: Verify JSON is not empty
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          path = Path("luma_premium_nodes.json")
+          data = json.loads(path.read_text(encoding="utf-8"))
+
+          if isinstance(data, list):
+              count = len(data)
+          elif isinstance(data, dict):
+              nodes = data.get("nodes") or data.get("data") or data.get("items") or []
+              count = len(nodes) if isinstance(nodes, list) else 0
+          else:
+              count = 0
+
+          print(f"Detected node count: {count}")
+
+          if count < 20:
+              raise SystemExit("Node JSON looks too small. Refusing to publish.")
+          PY
+
       - name: Commit and push updated nodes
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
+
           git add -f luma_premium_nodes.json
           git status --short
+
           if git diff --cached --quiet; then
             echo "No node changes detected."
             exit 0
           fi
+
           git commit -m "Auto-update premium VPN nodes"
           git push origin HEAD:${{ github.ref_name }}
