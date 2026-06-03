@@ -7,14 +7,19 @@ Developed by Alperen Burak Yeşil
 
 Purpose:
 Fetches VPN/Xray node configs from public repositories, deduplicates them,
-filters weak/zombie-prone configs, performs multi-attempt TLS-level probing,
+filters weak/zombie-prone configs, performs fast TLS-level probing,
 verifies country metadata with multiple GeoIP providers, assigns a quality score,
 and exports the best nodes per country.
 
 Important:
 This script does NOT run Xray subprocess. It is a strong cloud-side pre-filter,
-not a full end-to-end VPN egress validator. Flutter should still perform final
+not a full end-to-end VPN egress validator. Flutter still performs final
 SOCKS / generate_204 / real egress verification at connection time.
+
+Safety rule:
+This script never overwrites luma_premium_nodes.json with an empty or unsafe
+payload. If scraping fails, times out, or produces too few nodes, the existing
+working JSON is preserved.
 ================================================================================
 """
 
@@ -22,10 +27,12 @@ import asyncio
 import aiohttp
 import base64
 import json
+import os
 import re
 import ssl
 import time
 import urllib.parse
+from pathlib import Path
 from typing import Optional, Dict, Any, List, Tuple
 
 
@@ -51,26 +58,30 @@ SOURCES = [
 ]
 
 OUTPUT_FILE = "luma_premium_nodes.json"
+OUTPUT_TMP_FILE = "luma_premium_nodes.next.json"
 
-SOURCE_TIMEOUT = 10.0
-CONNECTION_TIMEOUT = 5.0
-READ_TIMEOUT = 2.0
-GEO_TIMEOUT = 8.0
+SOURCE_TIMEOUT = 14.0
+CONNECTION_TIMEOUT = 4.0
+READ_TIMEOUT = 1.6
+GEO_TIMEOUT = 7.0
 
-GLOBAL_MAX_SECONDS = 22 * 60
+GLOBAL_MAX_SECONDS = 34 * 60
 
-CONCURRENCY_LIMIT = 64
-GEO_CONCURRENCY_LIMIT = 28
-LATENCY_ATTEMPTS = 3
+CONCURRENCY_LIMIT = 96
+GEO_CONCURRENCY_LIMIT = 36
+LATENCY_ATTEMPTS = 2
 TOP_NODES_PER_COUNTRY = 15
 
-MIN_QUALITY_SCORE = 75.0
-MAX_ACCEPTED_PING = 1200
-MAX_ACCEPTED_JITTER = 800
-MIN_PROBE_SUCCESS_RATE = 0.67
+MIN_EXPORT_NODE_COUNT = 20
+MIN_COUNTRY_COUNT = 5
 
-MIN_GEO_CONFIDENCE = 0.58
-MIN_GEO_SOURCES_FOR_EXPORT = 2
+MIN_QUALITY_SCORE = 68.0
+MAX_ACCEPTED_PING = 1500
+MAX_ACCEPTED_JITTER = 1100
+MIN_PROBE_SUCCESS_RATE = 0.50
+
+MIN_GEO_CONFIDENCE = 0.50
+MIN_GEO_SOURCES_FOR_EXPORT = 1
 
 DROP_STRONG_MISMATCH_NODES = False
 DROP_LOW_TRUST_NODES = False
@@ -103,6 +114,7 @@ PREFERRED_TRANSPORTS = {
     "grpc",
     "h2",
     "http",
+    "xhttp",
 }
 
 PREFERRED_FINGERPRINTS = {
@@ -117,7 +129,7 @@ PREFERRED_FINGERPRINTS = {
 }
 
 GEO_BATCH_SIZE = 80
-GEO_REQUEST_DELAY = 0.30
+GEO_REQUEST_DELAY = 0.22
 
 GEO_PROVIDER_WEIGHTS = {
     "ip_api": 1.00,
@@ -141,7 +153,6 @@ CLOUDFLARE_IPV4_PREFIXES = (
     "197.234.",
     "198.41.",
 )
-
 
 COUNTRY_MAPPINGS = {
     "TR": ["🇹🇷", r"\bTR\b", r"\bTURKIYE\b", r"\bTÜRKİYE\b", r"\bTURKEY\b", r"\.tr$"],
@@ -172,7 +183,6 @@ COUNTRY_MAPPINGS = {
     "RU": ["🇷🇺", r"\bRU\b", r"\bRUSSIA\b", r"\.ru$"],
     "UA": ["🇺🇦", r"\bUA\b", r"\bUKRAINE\b", r"\.ua$"],
 }
-
 
 COUNTRY_NAMES = {
     "TR": "Türkiye",
@@ -244,7 +254,7 @@ def country_name(code: str) -> str:
 
 def decode_base64(data: str) -> str:
     try:
-        clean = data.strip()
+        clean = str(data or "").strip()
         clean = clean.replace("\n", "").replace("\r", "")
         clean = clean.replace("-", "+").replace("_", "/")
 
@@ -340,10 +350,13 @@ def get_transport(link: str) -> str:
     if not value:
         value = "tcp"
 
-    if value == "websocket":
-        return "ws"
+    aliases = {
+        "websocket": "ws",
+        "xhttp": "http",
+        "http/2": "h2",
+    }
 
-    return value
+    return aliases.get(value, value)
 
 
 def get_security(link: str) -> str:
@@ -370,7 +383,11 @@ def safe_host_from_link(link: str) -> str:
 def safe_port_from_link(link: str) -> int:
     try:
         uri = urllib.parse.urlparse(link)
-        return int(uri.port or 443)
+
+        if uri.port:
+            return int(uri.port)
+
+        return 443
     except Exception:
         match = re.search(r"@[^:/?#]+:(\d{2,5})", link)
         return int(match.group(1)) if match else 443
@@ -386,7 +403,12 @@ def normalize_vless_link(link: str) -> str:
     return link
 
 
-def predict_country_from_metadata(remark: str, sni: str, host: str, ip: str) -> Optional[str]:
+def predict_country_from_metadata(
+    remark: str,
+    sni: str,
+    host: str,
+    ip: str,
+) -> Optional[str]:
     raw_space = f"{remark} {sni} {host} {ip}"
     upper_space = raw_space.upper()
 
@@ -424,37 +446,62 @@ def node_fingerprint(node: Dict[str, Any]) -> str:
 
 
 def extract_links_from_text(text: str) -> List[str]:
-    lines: List[str] = []
+    candidates: List[str] = []
 
-    if "://" not in text:
-        decoded = decode_base64(text)
-        if "://" in decoded:
-            text = decoded
+    def collect_from_blob(blob: str) -> None:
+        if not blob:
+            return
+
+        for raw in blob.splitlines():
+            line = raw.strip()
+            if not line:
+                continue
+
+            if "://" in line:
+                candidates.append(line)
+
+        pattern = re.compile(
+            r"(vless|vmess|trojan|ss|hysteria2|hy2)://[^\s\"'<>]+",
+            re.IGNORECASE,
+        )
+
+        for match in pattern.finditer(blob):
+            candidates.append(match.group(0).strip())
+
+    collect_from_blob(text)
+
+    decoded = decode_base64(text)
+
+    if decoded != text:
+        collect_from_blob(decoded)
 
     for raw in text.splitlines():
         line = raw.strip()
-        if not line:
+        if not line or "://" in line:
             continue
 
-        if "://" in line:
-            lines.append(line)
+        decoded_line = decode_base64(line)
+
+        if decoded_line != line:
+            collect_from_blob(decoded_line)
+
+    cleaned: List[str] = []
+    seen = set()
+
+    for item in candidates:
+        item = item.strip().strip('"').strip("'").strip()
+        item = item.replace("\\n", "").replace("\\r", "")
+
+        if not item or "://" not in item:
             continue
 
-        decoded = decode_base64(line)
-        if decoded != line and "://" in decoded:
-            for decoded_line in decoded.splitlines():
-                decoded_line = decoded_line.strip()
-                if "://" in decoded_line:
-                    lines.append(decoded_line)
+        if item in seen:
+            continue
 
-    if not lines and "://" in text:
-        pattern = re.compile(
-            r"(vless|vmess|trojan|ss|hysteria2|hy2)://[^\s]+",
-            re.IGNORECASE,
-        )
-        lines.extend(match.group(0).strip() for match in pattern.finditer(text))
+        seen.add(item)
+        cleaned.append(item)
 
-    return lines
+    return cleaned
 
 
 # =============================================================================
@@ -592,7 +639,10 @@ def weighted_country_consensus(results: Dict[str, str]) -> Dict[str, Any]:
     }
 
 
-async def fetch_ip_api_batch(session: aiohttp.ClientSession, ips: List[str]) -> Dict[str, str]:
+async def fetch_ip_api_batch(
+    session: aiohttp.ClientSession,
+    ips: List[str],
+) -> Dict[str, str]:
     result: Dict[str, str] = {}
 
     try:
@@ -680,7 +730,7 @@ async def resolve_geo_consensus(nodes: List[Dict[str, Any]]) -> List[Dict[str, A
 
     timeout = aiohttp.ClientTimeout(total=GEO_TIMEOUT)
     headers = {
-        "User-Agent": "Mozilla/5.0 LumaShieldGeoValidator/3.0",
+        "User-Agent": "Mozilla/5.0 LumaShieldGeoValidator/3.2",
         "Accept": "application/json,*/*",
     }
 
@@ -695,7 +745,10 @@ async def resolve_geo_consensus(nodes: List[Dict[str, Any]]) -> List[Dict[str, A
             batch = ips[i:i + GEO_BATCH_SIZE]
             batch_result = await fetch_ip_api_batch(session, batch)
             ip_api_map.update(batch_result)
-            print(f"[LUMA] Geo batch {i // GEO_BATCH_SIZE + 1}: ip-api resolved={len(batch_result)}")
+            print(
+                f"[LUMA] Geo batch {i // GEO_BATCH_SIZE + 1}: "
+                f"ip-api resolved={len(batch_result)}"
+            )
             await asyncio.sleep(GEO_REQUEST_DELAY)
 
         ipinfo_tasks = [fetch_ipinfo_country(session, ip, geo_semaphore) for ip in ips]
@@ -773,9 +826,12 @@ async def resolve_geo_consensus(nodes: List[Dict[str, Any]]) -> List[Dict[str, A
         final_country = observed if observed != "UN" else predicted or "UN"
 
         trust_tier = "low"
+
         if confidence >= 0.95 and len(sources) >= 2 and not country_mismatch:
             trust_tier = "high"
         elif confidence >= 0.67 and len(sources) >= 2:
+            trust_tier = "medium"
+        elif confidence >= 0.50 and len(sources) >= 1:
             trust_tier = "medium"
 
         if cloudflare and conflict:
@@ -829,36 +885,40 @@ def compute_quality_score(node: Dict[str, Any]) -> float:
 
     score = 100.0
 
-    if ping > 1500:
+    if ping > 1800:
         score -= 50
+    elif ping > 1500:
+        score -= 40
     elif ping > 1200:
-        score -= 38
+        score -= 30
     elif ping > 900:
-        score -= 26
+        score -= 22
     elif ping > 700:
-        score -= 18
+        score -= 15
     elif ping > 450:
-        score -= 9
+        score -= 8
     elif ping < 250:
         score += 5
 
-    if jitter > 1000:
+    if jitter > 1300:
         score -= 35
+    elif jitter > 1100:
+        score -= 28
     elif jitter > 800:
-        score -= 26
+        score -= 20
     elif jitter > 500:
-        score -= 18
+        score -= 13
     elif jitter > 250:
-        score -= 9
+        score -= 7
     elif jitter < 120:
         score += 5
 
     if success_rate >= 1.0:
         score += 12
-    elif success_rate >= 0.67:
+    elif success_rate >= 0.50:
         score += 4
     else:
-        score -= 35
+        score -= 25
 
     if security == "reality":
         score += 14
@@ -871,7 +931,7 @@ def compute_quality_score(node: Dict[str, Any]) -> float:
         score += 6
     elif transport == "grpc":
         score += 7
-    elif transport in ["h2", "http"]:
+    elif transport in ["h2", "http", "xhttp"]:
         score += 4
     elif transport in BLOCKED_TRANSPORTS:
         score -= 45
@@ -886,28 +946,30 @@ def compute_quality_score(node: Dict[str, Any]) -> float:
     else:
         score -= 25
 
-    if fp in ["chrome", "firefox", "safari", "ios", "android", "randomized"]:
+    if fp in ["chrome", "firefox", "safari", "ios", "android", "randomized", "random"]:
         score += 4
 
     if sni and is_valid_hostname(sni):
         score += 5
     else:
-        score -= 18
+        score -= 12
 
     if geo_confidence >= 0.95 and len(geo_sources) >= 2:
         score += 8
     elif geo_confidence >= 0.67 and len(geo_sources) >= 2:
         score += 3
+    elif geo_confidence >= 0.50 and len(geo_sources) >= 1:
+        score += 1
     elif geo_confidence > 0:
-        score -= 7
+        score -= 5
     else:
-        score -= 18
+        score -= 12
 
     if geo_conflict:
         score -= 8
 
     if country_mismatch:
-        score -= 12
+        score -= 10
 
     if cloudflare:
         score -= 3
@@ -963,37 +1025,25 @@ async def single_tls_probe(node: Dict[str, Any]) -> Optional[int]:
             timeout=CONNECTION_TIMEOUT,
         )
 
-        host_header = sni if server_hostname else ip
-
-        request = (
-            "HEAD / HTTP/1.1\r\n"
-            f"Host: {host_header}\r\n"
-            "User-Agent: Mozilla/5.0 LumaShieldScanner/3.0\r\n"
-            "Accept: */*\r\n"
-            "Connection: close\r\n\r\n"
-        ).encode("utf-8", errors="ignore")
-
-        writer.write(request)
-        await writer.drain()
-
-        response = await asyncio.wait_for(reader.read(512), timeout=READ_TIMEOUT)
-
-        if not response:
-            return None
-
         elapsed_ms = int((time.time() - start) * 1000)
 
-        if (
-            b"HTTP/" in response
-            or b"400" in response
-            or b"403" in response
-            or b"404" in response
-            or b"301" in response
-            or b"302" in response
-            or b"bad request" in response.lower()
-            or b"<html" in response.lower()
-        ):
-            return elapsed_ms
+        try:
+            host_header = sni if server_hostname else ip
+
+            request = (
+                "HEAD / HTTP/1.1\r\n"
+                f"Host: {host_header}\r\n"
+                "User-Agent: Mozilla/5.0 LumaShieldScanner/3.2\r\n"
+                "Accept: */*\r\n"
+                "Connection: close\r\n\r\n"
+            ).encode("utf-8", errors="ignore")
+
+            writer.write(request)
+            await writer.drain()
+
+            await asyncio.wait_for(reader.read(256), timeout=READ_TIMEOUT)
+        except Exception:
+            pass
 
         return elapsed_ms
 
@@ -1009,17 +1059,21 @@ async def single_tls_probe(node: Dict[str, Any]) -> Optional[int]:
                 pass
 
 
-async def validate_node(node: Dict[str, Any], semaphore: asyncio.Semaphore) -> Optional[Dict[str, Any]]:
+async def validate_node(
+    node: Dict[str, Any],
+    semaphore: asyncio.Semaphore,
+) -> Optional[Dict[str, Any]]:
     async with semaphore:
         values: List[int] = []
 
         try:
             for _ in range(LATENCY_ATTEMPTS):
                 ms = await single_tls_probe(node)
+
                 if ms is not None:
                     values.append(ms)
 
-                await asyncio.sleep(0.10)
+                await asyncio.sleep(0.06)
 
             if not values:
                 return None
@@ -1027,7 +1081,7 @@ async def validate_node(node: Dict[str, Any], semaphore: asyncio.Semaphore) -> O
             values.sort()
 
             avg_ping = int(sum(values) / len(values))
-            jitter = values[-1] - values[0]
+            jitter = values[-1] - values[0] if len(values) > 1 else 0
             success_rate = len(values) / LATENCY_ATTEMPTS
 
             node["ping"] = avg_ping
@@ -1076,7 +1130,7 @@ async def fetch_all_links() -> List[str]:
     timeout = aiohttp.ClientTimeout(total=SOURCE_TIMEOUT)
 
     headers = {
-        "User-Agent": "Mozilla/5.0 LumaShieldNodeScanner/3.0",
+        "User-Agent": "Mozilla/5.0 LumaShieldNodeScanner/3.2",
         "Accept": "*/*",
         "Cache-Control": "no-cache",
         "Pragma": "no-cache",
@@ -1096,8 +1150,112 @@ async def fetch_all_links() -> List[str]:
 
 
 # =============================================================================
-# EXPORT
+# SAFE EXPORT
 # =============================================================================
+
+def count_exported_nodes(payload: Any) -> int:
+    if isinstance(payload, list):
+        return len(payload)
+
+    if isinstance(payload, dict):
+        total = 0
+
+        for value in payload.values():
+            if isinstance(value, list):
+                total += len(value)
+
+        return total
+
+    return 0
+
+
+def count_exported_countries(payload: Any) -> int:
+    if not isinstance(payload, dict):
+        return 0
+
+    return sum(1 for value in payload.values() if isinstance(value, list) and value)
+
+
+def load_existing_output() -> Optional[Dict[str, Any]]:
+    try:
+        path = Path(OUTPUT_FILE)
+
+        if not path.exists():
+            return None
+
+        data = json.loads(path.read_text(encoding="utf-8"))
+
+        if isinstance(data, dict) and count_exported_nodes(data) >= MIN_EXPORT_NODE_COUNT:
+            return data
+
+        return None
+    except Exception:
+        return None
+
+
+def fail_without_overwriting(reason: str) -> None:
+    print("===============================================================")
+    print("[LUMA] Refusing to publish empty or unsafe output.")
+    print("===============================================================")
+    print(f"[LUMA] Reason: {reason}")
+
+    existing = load_existing_output()
+
+    if existing is not None:
+        print(
+            "[LUMA] Existing output preserved: "
+            f"{count_exported_countries(existing)} countries, "
+            f"{count_exported_nodes(existing)} nodes"
+        )
+    else:
+        print("[LUMA] No valid existing output found.")
+
+    try:
+        tmp = Path(OUTPUT_TMP_FILE)
+        if tmp.exists():
+            tmp.unlink()
+    except Exception:
+        pass
+
+    raise SystemExit(1)
+
+
+def write_output_safely(payload: Dict[str, List[Dict[str, Any]]]) -> None:
+    total_nodes = count_exported_nodes(payload)
+    total_countries = count_exported_countries(payload)
+
+    print("===============================================================")
+    print("[LUMA] Output safety check.")
+    print("===============================================================")
+    print(f"[LUMA] Candidate countries: {total_countries}")
+    print(f"[LUMA] Candidate nodes: {total_nodes}")
+
+    if total_nodes < MIN_EXPORT_NODE_COUNT:
+        fail_without_overwriting(
+            f"too few nodes generated: {total_nodes}, minimum required: {MIN_EXPORT_NODE_COUNT}"
+        )
+
+    if total_countries < MIN_COUNTRY_COUNT:
+        fail_without_overwriting(
+            f"too few countries generated: {total_countries}, minimum required: {MIN_COUNTRY_COUNT}"
+        )
+
+    with open(OUTPUT_TMP_FILE, "w", encoding="utf-8") as f:
+        json.dump(payload, f, ensure_ascii=False, indent=2)
+
+    with open(OUTPUT_TMP_FILE, "r", encoding="utf-8") as f:
+        verified = json.load(f)
+
+    verified_nodes = count_exported_nodes(verified)
+    verified_countries = count_exported_countries(verified)
+
+    if verified_nodes < MIN_EXPORT_NODE_COUNT or verified_countries < MIN_COUNTRY_COUNT:
+        fail_without_overwriting("temporary output failed validation")
+
+    os.replace(OUTPUT_TMP_FILE, OUTPUT_FILE)
+
+    print("[LUMA] Safe output write completed.")
+
 
 def should_export_node(node: Dict[str, Any]) -> bool:
     country = normalize_country_code(node.get("country", ""))
@@ -1168,15 +1326,8 @@ def export_node_payload(node: Dict[str, Any], country: str) -> Dict[str, Any]:
     }
 
 
-def write_empty_output(reason: str) -> None:
-    with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
-        json.dump({}, f, ensure_ascii=False, indent=2)
-
-    print(f"[LUMA] Empty JSON exported. Reason: {reason}")
-
-
 # =============================================================================
-# MAIN
+# MAIN PIPELINE
 # =============================================================================
 
 async def run_pipeline() -> None:
@@ -1194,6 +1345,7 @@ async def run_pipeline() -> None:
 
     for link in raw_links:
         node = parse_config(link)
+
         if not node:
             continue
 
@@ -1208,11 +1360,10 @@ async def run_pipeline() -> None:
     print(f"[LUMA] Parsed strong candidates: {len(parsed_nodes)}")
 
     if not parsed_nodes:
-        write_empty_output("no parsed candidates")
-        return
+        fail_without_overwriting("no parsed candidates")
 
     print("===============================================================")
-    print("[LUMA] Running multi-probe TLS quality validation...")
+    print("[LUMA] Running fast TLS quality validation...")
     print("===============================================================")
 
     semaphore = asyncio.Semaphore(CONCURRENCY_LIMIT)
@@ -1225,8 +1376,7 @@ async def run_pipeline() -> None:
     print(f"[LUMA] Alive high-quality pre-geo candidates: {len(alive)}")
 
     if not alive:
-        write_empty_output("no alive candidates")
-        return
+        fail_without_overwriting("no alive candidates")
 
     alive = await resolve_geo_consensus(alive)
 
@@ -1266,8 +1416,7 @@ async def run_pipeline() -> None:
         if selected:
             out[country] = [export_node_payload(node, country) for node in selected]
 
-    with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
-        json.dump(out, f, ensure_ascii=False, indent=2)
+    write_output_safely(out)
 
     total_selected = sum(len(v) for v in out.values())
 
@@ -1297,10 +1446,13 @@ async def main() -> None:
     try:
         await asyncio.wait_for(run_pipeline(), timeout=GLOBAL_MAX_SECONDS)
     except asyncio.TimeoutError:
-        print(f"[LUMA] Global timeout exceeded: {GLOBAL_MAX_SECONDS}s")
-        write_empty_output("global timeout")
+        fail_without_overwriting(f"global timeout exceeded: {GLOBAL_MAX_SECONDS}s")
     except KeyboardInterrupt:
-        print("\n[LUMA] Interrupted by user.")
+        fail_without_overwriting("interrupted by user")
+    except SystemExit:
+        raise
+    except Exception as e:
+        fail_without_overwriting(f"fatal pipeline error: {e}")
 
 
 if __name__ == "__main__":
